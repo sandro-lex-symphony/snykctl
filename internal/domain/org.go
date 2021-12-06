@@ -26,6 +26,21 @@ func NewOrgs(c tools.HttpClient) *Orgs {
 	return o
 }
 
+func (o *Orgs) GetOrgName(id string) (string, error) {
+	if !o.Sync() {
+		err := o.Get()
+		if err != nil {
+			return "", err
+		}
+	}
+	for _, org := range o.Orgs {
+		if org.Id == id {
+			return org.Name, nil
+		}
+	}
+	return "", fmt.Errorf("getOrgName: org not found %s", id)
+}
+
 func (o *Orgs) SetClient(c tools.HttpClient) {
 	o.client = c
 }
@@ -94,6 +109,6 @@ func (o *Orgs) baseGet(raw bool) error {
 	return nil
 }
 
-func (o Orgs) IsSync() bool {
+func (o Orgs) Sync() bool {
 	return o.sync
 }
