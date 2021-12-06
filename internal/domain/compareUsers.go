@@ -3,7 +3,10 @@ package domain
 import (
 	"fmt"
 	"snykctl/internal/tools"
+	"strings"
 )
+
+const missing = "--- MISSING ---"
 
 func CompareUsers(client tools.HttpClient, org1, org2 string) error {
 	orgs := NewOrgs(client)
@@ -29,44 +32,32 @@ func CompareUsers(client tools.HttpClient, org1, org2 string) error {
 		return err
 	}
 
-	colsize := 40
-	mid := ""
-	left := fillSpaces(orgName1, colsize, " ")
-	fmt.Printf("%s%s%s\n", left, mid, orgName2)
-
-	leftBar := fillSpaces("", len(orgName1), "=")
-	leftBar = fillSpaces(leftBar, colsize, " ")
-	right := fillSpaces("", len(orgName2), "=")
-	fmt.Printf("%s%s%s\n", leftBar, mid, right)
-
-	r3 := mergeUsers(users1.Users, users2.Users)
-	for i := 0; i < len(r3); i++ {
-		if containUser(users1.Users, r3[i]) && containUser(users2.Users, r3[i]) {
-			fmt.Printf("%s%s%s\n", fillSpaces(r3[i].Name, colsize, " "), mid, r3[i].Name)
-		} else if containUser(users1.Users, r3[i]) {
-			fmt.Printf("%s%s--- MISSING ---\n", fillSpaces(r3[i].Name, colsize, " "), mid)
-		} else {
-			fmt.Printf("%s%s%s\n", fillSpaces("--- MISSING ---", colsize, " "), mid, r3[i].Name)
-		}
-	}
+	out := compare(orgName1, orgName2, users1.Users, users2.Users)
+	fmt.Print(out)
 
 	return nil
 }
 
-func addSpaces(size int, filler string) string {
-	ret := ""
-	for i := 0; i < size; i++ {
-		ret += filler
-	}
-	return ret
-}
+func compare(orgName1 string, orgName2 string, users1 []*User, users2 []*User) string {
+	var out string
+	out += fmt.Sprintf("%-40s%s\n", orgName1, orgName2)
 
-func fillSpaces(s string, size int, fillerChar string) string {
-	if len(s) >= size {
-		return s
+	leftBar := strings.Repeat("=", len(orgName1))
+	rightBar := strings.Repeat("=", len(orgName2))
+	out += fmt.Sprintf("%-40s%s\n", leftBar, rightBar)
+
+	r3 := mergeUsers(users1, users2)
+	for i := 0; i < len(r3); i++ {
+		if containUser(users1, r3[i]) && containUser(users2, r3[i]) {
+			out += fmt.Sprintf("%-40s%s\n", r3[i].Name, r3[i].Name)
+		} else if containUser(users1, r3[i]) {
+			out += fmt.Sprintf("%-40s%s\n", r3[i].Name, missing)
+		} else {
+			out += fmt.Sprintf("%-40s%s\n", missing, r3[i].Name)
+		}
 	}
-	filler := addSpaces(size-len(s), fillerChar)
-	return s + filler
+
+	return out
 }
 
 func mergeUsers(u1 []*User, u2 []*User) []*User {
