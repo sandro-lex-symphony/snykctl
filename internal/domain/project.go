@@ -76,6 +76,59 @@ func (p *Projects) baseGet(raw bool) error {
 	return nil
 }
 
+func (p *Projects) GetFiltered(env string, lifecycle string) error {
+	path := fmt.Sprintf("/org/%s/projects", p.Org.Id)
+
+	var attributes, filterContent string
+
+	if lifecycle != "" || env != "" {
+		attributes += ` "attributes": { `
+
+		if lifecycle != "" {
+			attributes += fmt.Sprintf(`"lifecycle": [ "%s" ]`, lifecycle)
+		}
+		if lifecycle != "" && env != "" {
+			attributes += ","
+		}
+
+		if env != "" {
+			attributes += fmt.Sprintf(`"environment": [ "%s" ]`, env)
+		}
+		attributes += " }"
+	}
+
+	// if Key != "" && Value != "" {
+	// 	tags += fmt.Sprintf(` "tags": { "includes": [ { "key": "%s", "value": "%s"} ] }`, Key, Value)
+	// }
+
+	// if attributes != "" && tags != "" {
+	// 	filterContent = attributes + ", " + tags
+	// } else if attributes != "" {
+	// 	filterContent = attributes
+	// } else {
+	// 	filterContent = tags
+	// }
+
+	filterContent = attributes
+
+	filters := fmt.Sprintf(`{ "filters": { %s } }`, filterContent)
+
+	var jsonStr = []byte(filters)
+	resp := p.client.RequestPost(path, jsonStr)
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("Get filtered projects list failed: %s ", resp.Status)
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&p); err != nil {
+		return fmt.Errorf("Get filtered projects list failed: %s ", err)
+	}
+
+	p.sync = true
+
+	return nil
+}
+
 func (p *Projects) String() (string, error) {
 	return p.toString("")
 }
@@ -89,12 +142,6 @@ func (p *Projects) Names() (string, error) {
 }
 
 func (p *Projects) toString(filter string) (string, error) {
-	if !p.sync {
-		err := p.Get()
-		if err != nil {
-			return "", err
-		}
-	}
 
 	var ret string
 	for _, prj := range p.Projects {

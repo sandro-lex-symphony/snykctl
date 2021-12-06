@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"snykctl/internal/config"
 	"snykctl/internal/domain"
@@ -24,28 +25,34 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// getOrgsCmd represents the getOrgs command
-var getOrgsCmd = &cobra.Command{
-	Use:   "getOrgs",
-	Short: "Gets the list of Snyk Organisations for the given token",
-	Long: `Gets the list of Snyk Organisations for the given token
-Example
-snykctl getOrgs
-snykctl getOrgs --quiet
-`,
+// getUsersCmd represents the getUsers command
+var getUsersCmd = &cobra.Command{
+	Use:   "getUsers",
+	Short: "A brief description of your command",
+	Long: `A longer description that spans multiple lines and likely contains examples
+and usage of using your command. For example:
+
+Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.`,
+	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) != 1 {
+			return errors.New("requires an Org Id")
+		}
+
 		client := tools.NewHttpclient(config.Instance)
 		if debug {
 			client.Debug = true
 		}
 
+		users := domain.NewUsers(client, args[0])
+
 		var out string
 		var err error
 
-		orgs := domain.NewOrgs(client)
-
 		if rawOutput {
-			out, err = orgs.GetRaw()
+			out, err = users.GetRaw()
 			if err != nil {
 				return err
 			}
@@ -53,28 +60,28 @@ snykctl getOrgs --quiet
 			return nil
 		}
 
-		err = orgs.Get()
+		err = users.Get()
 		if err != nil {
 			return err
 		}
 
 		if quiet {
-			out, _ = orgs.Quiet()
+			out = users.Quiet()
 		} else if names {
-			out, _ = orgs.Names()
+			out = users.Name()
 		} else {
-			out, _ = orgs.String()
+			out = users.String()
 		}
+		fmt.Print(out)
 
-		fmt.Println(out)
 		return nil
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(getOrgsCmd)
+	rootCmd.AddCommand(getUsersCmd)
+	getUsersCmd.PersistentFlags().BoolVarP(&quiet, "quiet", "q", false, "Prints only ids")
+	getUsersCmd.PersistentFlags().BoolVarP(&names, "names", "n", false, "Prints only names")
+	getUsersCmd.PersistentFlags().BoolVarP(&rawOutput, "raw", "r", false, "Prints raw json output from api")
 
-	getOrgsCmd.PersistentFlags().BoolVarP(&quiet, "quiet", "q", false, "Prints only ids")
-	getOrgsCmd.PersistentFlags().BoolVarP(&names, "names", "n", false, "Prints only names")
-	getOrgsCmd.PersistentFlags().BoolVarP(&rawOutput, "raw", "r", false, "Prints raw json output from api")
 }

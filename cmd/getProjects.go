@@ -28,13 +28,13 @@ import (
 // getProjectsCmd represents the getProjects command
 var getProjectsCmd = &cobra.Command{
 	Use:   "getProjects",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Get the list of projects in the Org",
+	Long: `Prints the list of projetcs in the org
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Example:
+  snykctl getProjects org_id [flags]
+`,
+	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
 			return errors.New("requires an Org Id")
@@ -50,7 +50,7 @@ to quickly create a Cobra application.`,
 		var ret string
 		var err error
 
-		if rawOuput {
+		if rawOutput {
 			ret, err = prjs.GetRaw()
 			if err != nil {
 				return err
@@ -59,9 +59,20 @@ to quickly create a Cobra application.`,
 			return nil
 		}
 
-		err = prjs.Get()
-		if err != nil {
-			return err
+		if checkAtLeastOneFilterSet() {
+			err = parseFilters()
+			if err != nil {
+				return err
+			}
+			err = prjs.GetFiltered(filterEnvironment, filterLifecycle)
+			if err != nil {
+				return err
+			}
+		} else {
+			err = prjs.Get()
+			if err != nil {
+				return err
+			}
 		}
 
 		if quiet {
@@ -81,5 +92,32 @@ func init() {
 
 	getProjectsCmd.PersistentFlags().BoolVarP(&quiet, "quiet", "q", false, "Prints only ids")
 	getProjectsCmd.PersistentFlags().BoolVarP(&names, "names", "n", false, "Prints only names")
-	getProjectsCmd.PersistentFlags().BoolVarP(&rawOuput, "raw", "r", false, "Prints raw json output from api")
+	getProjectsCmd.PersistentFlags().BoolVarP(&rawOutput, "raw", "r", false, "Prints raw json output from api")
+
+	getProjectsCmd.PersistentFlags().StringVarP(&filterEnvironment, "env", "", "", "Filters by environment (frontend | backend | internal | external | mobile | saas | on-prem | hosted | distributed)")
+	getProjectsCmd.PersistentFlags().StringVarP(&filterLifecycle, "lifecycle", "", "", "Filters by lifecycle (production | development | sandbox)")
+}
+
+func checkAtLeastOneFilterSet() bool {
+	// if (Key != "" && Value != "") || FilterEnvironment != "" || FilterLifecycle != "" {
+	if filterEnvironment != "" || filterLifecycle != "" {
+		return true
+	}
+	return false
+}
+
+func parseFilters() error {
+	if filterEnvironment != "" {
+		if !tools.Contains(validEnvironments[:], filterEnvironment) {
+			return fmt.Errorf("invalid environment value: %s\nValid values: %v", filterEnvironment, validEnvironments[:])
+		}
+	}
+
+	if filterLifecycle != "" {
+		if !tools.Contains(validLifecycle[:], filterLifecycle) {
+			return fmt.Errorf("invalid lifecycle value: %s\nValid values: %v", filterLifecycle, validLifecycle[:])
+		}
+	}
+
+	return nil
 }

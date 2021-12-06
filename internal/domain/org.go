@@ -43,13 +43,6 @@ func (o *Orgs) Names() (string, error) {
 }
 
 func (o *Orgs) toString(filter string) (string, error) {
-	if !o.sync {
-		err := o.Get()
-		if err != nil {
-			return "", err
-		}
-	}
-
 	var ret string
 	for _, org := range o.Orgs {
 		if filter == "id" {
@@ -78,11 +71,6 @@ func (o *Orgs) GetRaw() (string, error) {
 }
 
 func (o *Orgs) baseGet(raw bool) error {
-	// TODO: implement cache
-	// if OrgsCache != nil {
-	// 	return OrgsCache, nil
-	// }
-
 	resp := o.client.RequestGet("/orgs")
 	defer resp.Body.Close()
 
@@ -102,8 +90,6 @@ func (o *Orgs) baseGet(raw bool) error {
 		}
 	}
 	o.sync = true
-
-	//OrgsCache = &result
 
 	return nil
 }
