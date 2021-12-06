@@ -41,47 +41,34 @@ to quickly create a Cobra application.`,
 }
 
 func configure() {
-	var config config.ConfigProperties
-	config.Sync()
-
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Printf("token [.... %s]: ", config.ObfuscatedToken())
+	fmt.Printf("token [.... %s]: ", config.Instance.ObfuscatedToken())
 	text, _ := reader.ReadString('\n')
 	if len(text) > 2 {
-		config.SetToken(text[:len(text)-1])
+		config.Instance.SetToken(text[:len(text)-1])
 	}
 
-	fmt.Printf("group_id [.... %s]: ", config.ObfuscatedId())
+	fmt.Printf("group_id [.... %s]: ", config.Instance.ObfuscatedId())
 	text, _ = reader.ReadString('\n')
 	if len(text) > 2 {
-		config.SetId(text[:len(text)-1])
+		config.Instance.SetId(text[:len(text)-1])
 	}
 
-	fmt.Printf("timeout [%d]: ", config.Timeout())
+	fmt.Printf("timeout [%d]: ", config.Instance.Timeout())
 	text, _ = reader.ReadString('\n')
 	if len(text) > 1 {
-		config.SetTimeoutStr(text[:len(text)-1])
+		config.Instance.SetTimeoutStr(text[:len(text)-1])
 	}
 
-	fmt.Printf("worker size [%d]: ", config.WorkerSize())
+	fmt.Printf("worker size [%d]: ", config.Instance.WorkerSize())
 	text, _ = reader.ReadString('\n')
 	if len(text) > 1 {
-		config.SetWorkerSizeStr(text[:len(text)-1])
+		config.Instance.SetWorkerSizeStr(text[:len(text)-1])
 	}
 
-	config.WriteConf()
+	config.Instance.WriteConf()
 }
 
 func init() {
 	rootCmd.AddCommand(configureCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// configureCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// configureCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

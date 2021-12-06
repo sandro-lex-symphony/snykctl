@@ -15,3 +15,7 @@
 vendor/
 
 .dccache
+
+bin/
+go.sum
+snykctl

@@ -8,6 +8,9 @@ import (
 	"snykctl/internal/tools"
 )
 
+const membersPath = "/org/%s/members"
+const groupMembersPath = "/group/%s/members"
+
 type Users struct {
 	Users       []*User
 	Org         Org
@@ -34,20 +37,32 @@ func (u *Users) SetClient(c tools.HttpClient) {
 	u.client = c
 }
 
-func (u *Users) Get() error {
-	return u.baseGet(false)
+func (u *Users) GetGroup() error {
+	return u.baseGet(false, groupMembersPath)
 }
 
-func (u *Users) GetRaw() (string, error) {
-	err := u.baseGet(true)
+func (u *Users) GetGroupRaw() (string, error) {
+	err := u.baseGet(true, groupMembersPath)
 	if err != nil {
 		return "", err
 	}
 	return u.rawResponse, nil
 }
 
-func (u *Users) baseGet(raw bool) error {
-	path := fmt.Sprintf("/org/%s/members", u.Org.Id)
+func (u *Users) Get() error {
+	return u.baseGet(false, membersPath)
+}
+
+func (u *Users) GetRaw() (string, error) {
+	err := u.baseGet(true, membersPath)
+	if err != nil {
+		return "", err
+	}
+	return u.rawResponse, nil
+}
+
+func (u *Users) baseGet(raw bool, endpoint string) error {
+	path := fmt.Sprintf(endpoint, u.Org.Id)
 	resp := u.client.RequestGet(path)
 	defer resp.Body.Close()
 
@@ -58,13 +73,13 @@ func (u *Users) baseGet(raw bool) error {
 	if raw {
 		bodyBytes, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return fmt.Errorf("GetProjects failed: %s", err)
+			return fmt.Errorf("GetUsers failed: %s", err)
 		}
 		u.rawResponse = string(bodyBytes)
 	} else {
 		var result []*User
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return err
+			return fmt.Errorf("GetUsers failed: %s", err)
 		}
 		u.Users = result
 	}

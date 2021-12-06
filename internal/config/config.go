@@ -11,7 +11,7 @@ import (
 
 const defaultTimeout = 10
 const defaultWorkerSize = 10
-const fileName = ".snykctl.yaml"
+const defaultFileName = ".snykctl.yaml"
 const defaultUrl = "https://snyk.io/api/v1"
 
 type ConfigProperties struct {
@@ -21,38 +21,52 @@ type ConfigProperties struct {
 	workerSize int
 	url        string
 	sync       bool
+	filename   string
 }
 
 func (c *ConfigProperties) SetSync(b bool) {
 	c.sync = b
 }
 
-func (c *ConfigProperties) Sync() {
-	if !c.sync {
-		c.readConf()
+func (c *ConfigProperties) Init(sync bool) error {
+	c.filename = defaultFileName
+	c.timeout = defaultTimeout
+	c.workerSize = defaultWorkerSize
+	c.url = defaultUrl
+	if sync {
+		return c.Sync()
 	}
+	return nil
+}
+
+func (c *ConfigProperties) Sync() error {
+	if !c.sync {
+		return c.ReadConf()
+	}
+	return nil
+}
+
+func (c *ConfigProperties) SetFilename(file string) {
+	c.filename = file
+}
+
+func (c ConfigProperties) Filename() string {
+	return c.filename
 }
 
 func (c ConfigProperties) Url() string {
-	if !c.sync {
-		c.readConf()
-	}
-
 	return c.url
 }
 
 func (c ConfigProperties) Token() string {
-	c.Sync()
 	return c.token
 }
 
 func (c ConfigProperties) Id() string {
-	c.Sync()
 	return c.id
 }
 
 func (c ConfigProperties) ObfuscatedToken() string {
-	c.Sync()
 	if len(c.token) > 6 {
 		return c.token[len(c.token)-6:]
 	}
@@ -61,7 +75,6 @@ func (c ConfigProperties) ObfuscatedToken() string {
 }
 
 func (c ConfigProperties) ObfuscatedId() string {
-	c.Sync()
 	if len(c.id) > 6 {
 		return c.id[len(c.id)-6:]
 	}
@@ -70,12 +83,10 @@ func (c ConfigProperties) ObfuscatedId() string {
 }
 
 func (c ConfigProperties) Timeout() int {
-	c.Sync()
 	return c.timeout
 }
 
 func (c ConfigProperties) WorkerSize() int {
-	c.Sync()
 	return c.workerSize
 }
 
@@ -115,32 +126,32 @@ func (c *ConfigProperties) SetUrl(u string) {
 	c.url = u
 }
 
-func (c *ConfigProperties) WriteConf() {
+func (c *ConfigProperties) WriteConf() error {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("writeConf failed: %s", err)
 	}
 	filename := home + "/.snykctl.yaml"
 	confStr := fmt.Sprintf("token: %s\nid: %s\ntimeout: %d\nworkerSize: %d\n", c.token, c.id, c.timeout, c.workerSize)
 	d1 := []byte(confStr)
 	err = ioutil.WriteFile(filename, d1, 0644)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("writeConf failed: %s", err)
 	}
 	c.sync = true
+	return nil
 }
 
-func (c *ConfigProperties) readConf() {
+func (c *ConfigProperties) ReadConf() error {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("readConf failed: %s", err)
 	}
 
-	filename := home + "/.snykctl.yaml"
-
-	file, err := os.Open(filename)
+	filepath := home + "/" + c.filename
+	file, err := os.Open(filepath)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("readConf failed: %s", err)
 	}
 	defer file.Close()
 
@@ -164,7 +175,7 @@ func (c *ConfigProperties) readConf() {
 				if key == "timeout" {
 					t, err := strconv.Atoi(value)
 					if err != nil {
-						panic(err)
+						return fmt.Errorf("readConf failed: %s", err)
 					}
 					c.timeout = t
 				}
@@ -172,7 +183,7 @@ func (c *ConfigProperties) readConf() {
 				if key == "workerSize" {
 					w, err := strconv.Atoi(value)
 					if err != nil {
-						panic(err)
+						return fmt.Errorf("readConf failed: %s", err)
 					}
 					c.workerSize = w
 				}
@@ -189,10 +200,11 @@ func (c *ConfigProperties) readConf() {
 	}
 
 	if err := scanner.Err(); err != nil {
-		panic(err)
+		return fmt.Errorf("readConf failed: %s", err)
 	}
 
 	c.sync = true
+	return nil
 }
 
 var Instance ConfigProperties

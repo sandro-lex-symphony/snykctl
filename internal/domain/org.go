@@ -81,7 +81,7 @@ func (o *Orgs) baseGet(raw bool) error {
 	if raw {
 		bodyBytes, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return fmt.Errorf("GetProjects failed: %s", err)
+			return fmt.Errorf("GetOrgs failed: %s", err)
 		}
 		o.rawResponse = string(bodyBytes)
 	} else {
