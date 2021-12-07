@@ -12,6 +12,11 @@ import (
 const projectsPath = "/org/%s/projects"
 const projectPath = "/org/%s/project/%s"
 const tagPath = "/org/%s/project/%s/tags"
+const attributesPath = "/org/%s/project/%s/attributes"
+
+var validEnvironments = [9]string{"frontend", "backend", "internal", "external", "mobile", "saas", "on-prem", "hosted", "distributed"}
+var validLifecycle = [3]string{"production", "development", "sandbox"}
+var validCriticality = [4]string{"critical", "high", "medium", "low"}
 
 type Projects struct {
 	Org         Org
@@ -193,6 +198,39 @@ func (p Projects) IsSync() bool {
 	return p.sync
 }
 
+func (p *Projects) AddAttributes(prj_id string, env string, lifecycle string, criticality string) error {
+	err := ParseAttributes(env, lifecycle, criticality)
+	if err != nil {
+		return err
+	}
+	var values []string
+	if env != "" {
+		value := fmt.Sprintf(`"environment": ["%s"]`, env)
+		values = append(values, value)
+	}
+	if lifecycle != "" {
+		value := fmt.Sprintf(`"lifecycle": ["%s"]`, lifecycle)
+		values = append(values, value)
+	}
+	if criticality != "" {
+		value := fmt.Sprintf(`"criticality": ["%s"]`, criticality)
+		values = append(values, value)
+	}
+	c := strings.Join(values, ",")
+	attrBody := fmt.Sprintf("{%s}", c)
+
+	var jsonStr = []byte(attrBody)
+
+	path := fmt.Sprintf(attributesPath, p.Org.Id, prj_id)
+	resp := p.client.RequestPost(path, jsonStr)
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to add attribute %s", resp.Status)
+	}
+	return nil
+}
+
 func (p *Projects) AddTag(prj_id string, tag string) error {
 	k, v, err := ParseTag(tag)
 	if err != nil {
@@ -211,4 +249,41 @@ func (p *Projects) AddTag(prj_id string, tag string) error {
 		return fmt.Errorf("failed to add tag %s", resp.Status)
 	}
 	return nil
+}
+
+func ParseAttributes(filterEnv, filterLifecycle, filterCriticality string) error {
+	if filterEnv != "" {
+		if !tools.Contains(validEnvironments[:], filterEnv) {
+			return fmt.Errorf("invalid environment value: %s\nValid values: %v", filterEnv, validEnvironments[:])
+		}
+	}
+
+	if filterLifecycle != "" {
+		if !tools.Contains(validLifecycle[:], filterLifecycle) {
+			return fmt.Errorf("invalid lifecycle value: %s\nValid values: %v", filterLifecycle, validLifecycle[:])
+		}
+	}
+
+	if filterCriticality != "" {
+		if !tools.Contains(validCriticality[:], filterCriticality) {
+			return fmt.Errorf("invalid lifecycle value: %s\nValid values: %v", filterCriticality, validCriticality[:])
+		}
+	}
+	return nil
+}
+
+func ParseTags(filterTag []string) (map[string]string, error) {
+	var mTags map[string]string
+	if len(filterTag) > 0 {
+		mTags = make(map[string]string)
+		for _, tag := range filterTag {
+			k, v, err := ParseTag(tag)
+			if err != nil {
+				return mTags, err
+			}
+			mTags[k] = v
+		}
+	}
+
+	return mTags, nil
 }

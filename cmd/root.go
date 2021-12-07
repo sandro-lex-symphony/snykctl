@@ -30,9 +30,6 @@ var filterLifecycle string
 var filterEnvironment string
 var filterTag []string
 
-var validEnvironments [9]string
-var validLifecycle [3]string
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "snykctl",
@@ -55,9 +52,6 @@ func Execute() {
 }
 
 func init() {
-	validEnvironments = [9]string{"frontend", "backend", "internal", "external", "mobile", "saas", "on-prem", "hosted", "distributed"}
-	validLifecycle = [3]string{"production", "development", "sandbox"}
-
 	cobra.OnInitialize(initConfig)
 
 	// Here you will define your flags and configuration settings.

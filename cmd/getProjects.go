@@ -54,10 +54,12 @@ Example:
 		}
 
 		if checkAtLeastOneFilterSet() {
-			err = parseFilters()
+			err := domain.ParseAttributes(filterEnvironment, filterLifecycle, "")
 			if err != nil {
 				return err
 			}
+
+			mTags, err := domain.ParseTags(filterTag)
 
 			err = prjs.GetFiltered(filterEnvironment, filterLifecycle, mTags)
 			if err != nil {
@@ -88,37 +90,8 @@ func init() {
 }
 
 func checkAtLeastOneFilterSet() bool {
-	// if (Key != "" && Value != "") || FilterEnvironment != "" || FilterLifecycle != "" {
 	if filterEnvironment != "" || filterLifecycle != "" || len(filterTag) > 0 {
 		return true
 	}
 	return false
-}
-
-func parseFilters() error {
-	if filterEnvironment != "" {
-		if !tools.Contains(validEnvironments[:], filterEnvironment) {
-			return fmt.Errorf("invalid environment value: %s\nValid values: %v", filterEnvironment, validEnvironments[:])
-		}
-	}
-
-	if filterLifecycle != "" {
-		if !tools.Contains(validLifecycle[:], filterLifecycle) {
-			return fmt.Errorf("invalid lifecycle value: %s\nValid values: %v", filterLifecycle, validLifecycle[:])
-		}
-	}
-
-	if len(filterTag) > 0 {
-		mTags = make(map[string]string)
-		for _, tag := range filterTag {
-			k, v, err := domain.ParseTag(tag)
-			if err != nil {
-				return err
-			}
-			mTags[k] = v
-		}
-
-	}
-
-	return nil
 }
