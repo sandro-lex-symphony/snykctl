@@ -79,6 +79,7 @@ func (sc DefaultClient) RequestPost(path string, data []byte) *http.Response {
 	req := sc.Url() + path
 	if sc.Debug {
 		fmt.Println("POST", req)
+		fmt.Println(string(data))
 	}
 
 	request, err := http.NewRequest("POST", req, bytes.NewBuffer(data))
