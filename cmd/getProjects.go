@@ -67,14 +67,7 @@ Example:
 			}
 		}
 
-		if quiet {
-			ret, _ = prjs.Quiet()
-		} else if names {
-			ret, _ = prjs.Names()
-		} else {
-			ret, _ = prjs.String()
-		}
-		fmt.Println(ret)
+		prjs.Print(quiet, names)
 		return nil
 	},
 }

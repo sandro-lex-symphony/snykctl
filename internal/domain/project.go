@@ -8,6 +8,9 @@ import (
 	"snykctl/internal/tools"
 )
 
+const projectsPath = "/org/%s/projects"
+const projectPath = "/org/%s/project/%s"
+
 type Projects struct {
 	Org         Org
 	Projects    []*Project
@@ -45,13 +48,44 @@ func (p *Projects) Get() error {
 	return p.baseGet(false)
 }
 
+func (p *Projects) GetProject(prj_id string) error {
+	return p.baseGetProject(false, prj_id)
+}
+
+func (p *Projects) GetRawProject(prj_id string) (string, error) {
+	err := p.baseGetProject(true, prj_id)
+	if err != nil {
+		return "", nil
+	}
+	return p.rawResponse, nil
+}
+
+func (p *Projects) baseGetProject(raw bool, prj_id string) error {
+	path := fmt.Sprintf(projectPath, p.Org.Id, prj_id)
+	resp := p.client.RequestGet(path)
+	defer resp.Body.Close()
+
+	if raw {
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("GetProject failed: %s", err)
+		}
+		p.rawResponse = string(bodyBytes)
+	} else {
+		if err := json.NewDecoder(resp.Body).Decode(&p); err != nil {
+			return fmt.Errorf("GetProject failed: %s", err)
+		}
+	}
+	return nil
+}
+
 func (p *Projects) baseGet(raw bool) error {
 	// TODO: add filter support
 	// if FilterLifecycle != "" || FilterEnvironment != "" || (Key != "" && Value != "") {
 	// 	return GetFilteredProjects(org_id)
 	// }
 
-	path := fmt.Sprintf("/org/%s/projects", p.Org.Id)
+	path := fmt.Sprintf(projectsPath, p.Org.Id)
 	resp := p.client.RequestGet(path)
 	defer resp.Body.Close()
 
@@ -154,6 +188,19 @@ func (p *Projects) toString(filter string) (string, error) {
 		}
 	}
 	return ret, nil
+}
+
+func (p Projects) Print(quiet, names bool) {
+	var out string
+	if quiet {
+		out, _ = p.Quiet()
+	} else if names {
+		out, _ = p.Names()
+	} else {
+		out, _ = p.String()
+	}
+
+	fmt.Print(out)
 }
 
 func (p Projects) IsSync() bool {
