@@ -73,6 +73,20 @@ func (o *Orgs) toString(filter string) (string, error) {
 	return ret, nil
 }
 
+func (o Orgs) Print(quiet, names bool) {
+	var out string
+	if quiet {
+		out, _ = o.Quiet()
+	} else if names {
+		out, _ = o.Names()
+	} else {
+		out, _ = o.String()
+	}
+
+	fmt.Print(out)
+
+}
+
 func (o *Orgs) Get() error {
 	return o.baseGet(false)
 }

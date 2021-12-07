@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"snykctl/internal/config"
 	"snykctl/internal/domain"
@@ -36,14 +35,7 @@ Example:
 `,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if len(args) != 1 {
-			return errors.New("requires an Org Id")
-		}
-
-		client := tools.NewHttpclient(config.Instance)
-		if debug {
-			client.Debug = true
-		}
+		client := tools.NewHttpclient(config.Instance, debug)
 
 		prjs := domain.NewProjects(client, args[0])
 

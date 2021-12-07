@@ -26,7 +26,7 @@ type DefaultClient struct {
 	Debug bool
 }
 
-func NewHttpclient(conf config.ConfigProperties) DefaultClient {
+func NewHttpclient(conf config.ConfigProperties, d bool) DefaultClient {
 	var c DefaultClient
 	c.SetUrl(conf.Url())
 	c.SetToken(conf.Token())
@@ -34,6 +34,7 @@ func NewHttpclient(conf config.ConfigProperties) DefaultClient {
 	c.SetTimeout(conf.Timeout())
 	c.SetWorkerSize(conf.WorkerSize())
 	c.SetSync(true)
+	c.Debug = d
 	return c
 }
 

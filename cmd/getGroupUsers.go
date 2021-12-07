@@ -43,10 +43,7 @@ to quickly create a Cobra application.`,
 			group_id = args[0]
 		}
 
-		client := tools.NewHttpclient(config.Instance)
-		if debug {
-			client.Debug = true
-		}
+		client := tools.NewHttpclient(config.Instance, debug)
 
 		users := domain.NewUsers(client, group_id)
 

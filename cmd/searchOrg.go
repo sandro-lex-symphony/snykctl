@@ -16,34 +16,47 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"snykctl/internal/config"
 	"snykctl/internal/domain"
 	"snykctl/internal/tools"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
 
-// getOrgNameCmd represents the getOrgName command
-var getOrgNameCmd = &cobra.Command{
-	Use:   "getOrgName",
-	Short: "Returns the name of the gievn org",
-	Long: `Returns the name of the given org.  For example:
-snykctl getOrgName [org-id]`,
+// searchOrgCmd represents the searchOrg command
+var searchOrgCmd = &cobra.Command{
+	Use:   "searchOrg",
+	Short: "Search org using name",
+	Long: `Search org using name For example:
+snykctl searchOrg [search-term]
+`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, debug)
 
 		orgs := domain.NewOrgs(client)
-		out, err := orgs.GetOrgName(args[0])
+		err := orgs.Get()
 		if err != nil {
 			return err
 		}
-		fmt.Println(out)
+
+		var filteredOrgs domain.Orgs
+		for _, org := range orgs.Orgs {
+			if strings.Contains(strings.ToLower(org.Name), strings.ToLower(args[0])) {
+				filteredOrgs.Orgs = append(filteredOrgs.Orgs, org)
+			}
+		}
+
+		filteredOrgs.Print(quiet, names)
+
 		return nil
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(getOrgNameCmd)
+	rootCmd.AddCommand(searchOrgCmd)
+
+	searchOrgCmd.PersistentFlags().BoolVarP(&quiet, "quiet", "q", false, "Prints only ids")
+	searchOrgCmd.PersistentFlags().BoolVarP(&names, "names", "n", false, "Prints only names")
 }

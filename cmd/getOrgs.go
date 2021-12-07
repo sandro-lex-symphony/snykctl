@@ -34,10 +34,7 @@ snykctl getOrgs
 snykctl getOrgs --quiet
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := tools.NewHttpclient(config.Instance)
-		if debug {
-			client.Debug = true
-		}
+		client := tools.NewHttpclient(config.Instance, debug)
 
 		var out string
 		var err error
@@ -57,16 +54,8 @@ snykctl getOrgs --quiet
 		if err != nil {
 			return err
 		}
+		orgs.Print(quiet, names)
 
-		if quiet {
-			out, _ = orgs.Quiet()
-		} else if names {
-			out, _ = orgs.Names()
-		} else {
-			out, _ = orgs.String()
-		}
-
-		fmt.Println(out)
 		return nil
 	},
 }
