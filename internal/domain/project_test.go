@@ -124,3 +124,35 @@ func Test_Project_Get_Raw(t *testing.T) {
 
 	assert.Equal(t, raw, actual)
 }
+
+func Test_AddTag_OK(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ``
+	client.StatusCode = http.StatusOK
+	client.Status = "XXX"
+	prjs := NewProjects(client, "org_id")
+	err := prjs.AddTag("org2", "k=v")
+	assert.Nil(t, err)
+}
+
+func Test_AddTag_parseFailed(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ``
+	client.StatusCode = http.StatusOK
+	client.Status = "XXX"
+	prjs := NewProjects(client, "org_id")
+	err := prjs.AddTag("org2", "vvv")
+	expectedErrorMsg := "invalid tag. Not a key=value format"
+	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
+}
+
+func Test_AddTag_KO(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ``
+	client.StatusCode = http.StatusUnauthorized
+	client.Status = "XXX"
+	prjs := NewProjects(client, "org_id")
+	err := prjs.AddTag("org2", "k=v")
+	expectedErrorMsg := "failed to add tag XXX"
+	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
+}

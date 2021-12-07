@@ -11,6 +11,7 @@ import (
 
 const projectsPath = "/org/%s/projects"
 const projectPath = "/org/%s/project/%s"
+const tagPath = "/org/%s/project/%s/tags"
 
 type Projects struct {
 	Org         Org
@@ -190,4 +191,24 @@ func (p Projects) Print(quiet, names bool) {
 
 func (p Projects) IsSync() bool {
 	return p.sync
+}
+
+func (p *Projects) AddTag(prj_id string, tag string) error {
+	k, v, err := ParseTag(tag)
+	if err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf(tagPath, p.Org.Id, prj_id)
+
+	tagBody := fmt.Sprintf(`{"key": "%s", "value": "%s"}`, k, v)
+	var jsonStr = []byte(tagBody)
+
+	resp := p.client.RequestPost(path, jsonStr)
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to add tag %s", resp.Status)
+	}
+	return nil
 }

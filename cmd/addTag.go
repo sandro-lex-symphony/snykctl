@@ -37,7 +37,8 @@ to quickly create a Cobra application.`,
 	Args: cobra.MinimumNArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, false)
-		err := domain.AddTag(client, args[0], args[1], args[2])
+		prjs := domain.NewProjects(client, args[0])
+		err := prjs.AddTag(args[1], args[2])
 		if err != nil {
 			return err
 		}
@@ -49,14 +50,4 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(addTagCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// addTagCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// addTagCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
