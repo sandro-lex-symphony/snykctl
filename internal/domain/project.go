@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"snykctl/internal/tools"
+	"strings"
 )
 
 const projectsPath = "/org/%s/projects"
@@ -36,7 +37,8 @@ func (p *Projects) SetClient(c tools.HttpClient) {
 }
 
 func (p *Projects) GetRaw() (string, error) {
-	err := p.baseGet(true)
+	path := fmt.Sprintf(projectsPath, p.Org.Id)
+	err := p.baseGet(true, path)
 	if err != nil {
 		return "", err
 	}
@@ -45,47 +47,25 @@ func (p *Projects) GetRaw() (string, error) {
 }
 
 func (p *Projects) Get() error {
-	return p.baseGet(false)
+	path := fmt.Sprintf(projectsPath, p.Org.Id)
+	return p.baseGet(false, path)
 }
 
 func (p *Projects) GetProject(prj_id string) error {
-	return p.baseGetProject(false, prj_id)
+	path := fmt.Sprintf(projectPath, p.Org.Id, prj_id)
+	return p.baseGet(false, path)
 }
 
 func (p *Projects) GetRawProject(prj_id string) (string, error) {
-	err := p.baseGetProject(true, prj_id)
+	path := fmt.Sprintf(projectPath, p.Org.Id, prj_id)
+	err := p.baseGet(true, path)
 	if err != nil {
 		return "", nil
 	}
 	return p.rawResponse, nil
 }
 
-func (p *Projects) baseGetProject(raw bool, prj_id string) error {
-	path := fmt.Sprintf(projectPath, p.Org.Id, prj_id)
-	resp := p.client.RequestGet(path)
-	defer resp.Body.Close()
-
-	if raw {
-		bodyBytes, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return fmt.Errorf("GetProject failed: %s", err)
-		}
-		p.rawResponse = string(bodyBytes)
-	} else {
-		if err := json.NewDecoder(resp.Body).Decode(&p); err != nil {
-			return fmt.Errorf("GetProject failed: %s", err)
-		}
-	}
-	return nil
-}
-
-func (p *Projects) baseGet(raw bool) error {
-	// TODO: add filter support
-	// if FilterLifecycle != "" || FilterEnvironment != "" || (Key != "" && Value != "") {
-	// 	return GetFilteredProjects(org_id)
-	// }
-
-	path := fmt.Sprintf(projectsPath, p.Org.Id)
+func (p *Projects) baseGet(raw bool, path string) error {
 	resp := p.client.RequestGet(path)
 	defer resp.Body.Close()
 
@@ -106,14 +86,13 @@ func (p *Projects) baseGet(raw bool) error {
 	}
 
 	p.sync = true
-
 	return nil
 }
 
-func (p *Projects) GetFiltered(env string, lifecycle string) error {
-	path := fmt.Sprintf("/org/%s/projects", p.Org.Id)
+func (p *Projects) GetFiltered(env string, lifecycle string, mTags map[string]string) error {
+	path := fmt.Sprintf(projectsPath, p.Org.Id)
 
-	var attributes, filterContent string
+	var attributes, filterContent, tags string
 
 	if lifecycle != "" || env != "" {
 		attributes += ` "attributes": { `
@@ -131,19 +110,25 @@ func (p *Projects) GetFiltered(env string, lifecycle string) error {
 		attributes += " }"
 	}
 
-	// if Key != "" && Value != "" {
-	// 	tags += fmt.Sprintf(` "tags": { "includes": [ { "key": "%s", "value": "%s"} ] }`, Key, Value)
-	// }
+	if len(mTags) > 0 {
+		tags += ` "tags": { "includes": [`
+		var ii []string
+		for key, value := range mTags {
+			i := fmt.Sprintf(`{ "key": "%s", "value": "%s" } `, key, value)
+			ii = append(ii, i)
+		}
+		tag := strings.Join(ii, ", ")
+		tags += tag
+		tags += "] }"
+	}
 
-	// if attributes != "" && tags != "" {
-	// 	filterContent = attributes + ", " + tags
-	// } else if attributes != "" {
-	// 	filterContent = attributes
-	// } else {
-	// 	filterContent = tags
-	// }
-
-	filterContent = attributes
+	if attributes != "" && tags != "" {
+		filterContent = attributes + ", " + tags
+	} else if attributes != "" {
+		filterContent = attributes
+	} else {
+		filterContent = tags
+	}
 
 	filters := fmt.Sprintf(`{ "filters": { %s } }`, filterContent)
 

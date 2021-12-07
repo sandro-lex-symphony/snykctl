@@ -24,6 +24,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var mTags map[string]string
+
 // getProjectsCmd represents the getProjects command
 var getProjectsCmd = &cobra.Command{
 	Use:   "getProjects",
@@ -56,7 +58,8 @@ Example:
 			if err != nil {
 				return err
 			}
-			err = prjs.GetFiltered(filterEnvironment, filterLifecycle)
+
+			err = prjs.GetFiltered(filterEnvironment, filterLifecycle, mTags)
 			if err != nil {
 				return err
 			}
@@ -81,11 +84,12 @@ func init() {
 
 	getProjectsCmd.PersistentFlags().StringVarP(&filterEnvironment, "env", "", "", "Filters by environment (frontend | backend | internal | external | mobile | saas | on-prem | hosted | distributed)")
 	getProjectsCmd.PersistentFlags().StringVarP(&filterLifecycle, "lifecycle", "", "", "Filters by lifecycle (production | development | sandbox)")
+	getProjectsCmd.PersistentFlags().StringSliceVarP(&filterTag, "tag", "", []string{}, "Filters by tag (key1=value1;key2=value2)")
 }
 
 func checkAtLeastOneFilterSet() bool {
 	// if (Key != "" && Value != "") || FilterEnvironment != "" || FilterLifecycle != "" {
-	if filterEnvironment != "" || filterLifecycle != "" {
+	if filterEnvironment != "" || filterLifecycle != "" || len(filterTag) > 0 {
 		return true
 	}
 	return false
@@ -102,6 +106,18 @@ func parseFilters() error {
 		if !tools.Contains(validLifecycle[:], filterLifecycle) {
 			return fmt.Errorf("invalid lifecycle value: %s\nValid values: %v", filterLifecycle, validLifecycle[:])
 		}
+	}
+
+	if len(filterTag) > 0 {
+		mTags = make(map[string]string)
+		for _, tag := range filterTag {
+			k, v, err := domain.ParseTag(tag)
+			if err != nil {
+				return err
+			}
+			mTags[k] = v
+		}
+
 	}
 
 	return nil

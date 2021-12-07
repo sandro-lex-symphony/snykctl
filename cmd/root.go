@@ -28,6 +28,7 @@ var names bool
 var rawOutput bool
 var filterLifecycle string
 var filterEnvironment string
+var filterTag []string
 
 var validEnvironments [9]string
 var validLifecycle [3]string
