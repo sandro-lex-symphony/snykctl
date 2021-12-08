@@ -185,3 +185,49 @@ func Test_ParseAttributes(t *testing.T) {
 		}
 	}
 }
+
+func Test_ParseTags(t *testing.T) {
+	// one ok
+	tag := []string{"key=value"}
+	pTags, err := ParseTags(tag)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(pTags))
+	assert.Equal(t, pTags["key"], "value")
+
+	// two ok
+	tag = append(tag, "key2=value2")
+	pTags, err = ParseTags(tag)
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(pTags))
+	assert.Equal(t, pTags["key"], "value")
+	assert.Equal(t, pTags["key2"], "value2")
+
+	// ko
+	tag = []string{"qweasd"}
+	_, err = ParseTags(tag)
+	expected := "invalid tag. Not a key=value format"
+	assert.EqualErrorf(t, err, expected, "Error should be: %v, got: %v", expected, err)
+}
+
+type testAttributesBody struct {
+	env         string
+	lifecycle   string
+	criticality string
+	body        string
+}
+
+func Test_Build_AttributesBody(t *testing.T) {
+	tests := []testAttributesBody{
+		testAttributesBody{env: "", lifecycle: "", criticality: "", body: ""},
+		testAttributesBody{env: "production", lifecycle: "", criticality: "", body: `{ "environment": ["production"] }`},
+		testAttributesBody{env: "", lifecycle: "frontend", criticality: "", body: `{ "lifecycle": ["frontend"] }`},
+		testAttributesBody{env: "", lifecycle: "", criticality: "high", body: `{ "criticality": ["high"] }`},
+		testAttributesBody{env: "production", lifecycle: "frontend", criticality: "", body: `{ "environment": ["production"],"lifecycle": ["frontend"] }`},
+		testAttributesBody{env: "production", lifecycle: "frontend", criticality: "medium", body: `{ "environment": ["production"],"lifecycle": ["frontend"],"criticality": ["medium"] }`},
+	}
+
+	for _, test := range tests {
+		body := BuildAttributesBody(test.env, test.lifecycle, test.criticality)
+		assert.Equal(t, test.body, body)
+	}
+}

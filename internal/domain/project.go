@@ -244,10 +244,9 @@ func (p Projects) IsSync() bool {
 	return p.sync
 }
 
-func (p *Projects) AddAttributes(prj_id string, env string, lifecycle string, criticality string) error {
-	err := ParseAttributes(env, lifecycle, criticality)
-	if err != nil {
-		return err
+func BuildAttributesBody(env, lifecycle, criticality string) string {
+	if env == "" && lifecycle == "" && criticality == "" {
+		return ""
 	}
 	var values []string
 	if env != "" {
@@ -263,7 +262,16 @@ func (p *Projects) AddAttributes(prj_id string, env string, lifecycle string, cr
 		values = append(values, value)
 	}
 	c := strings.Join(values, ",")
-	attrBody := fmt.Sprintf("{ %s }", c)
+	return fmt.Sprintf("{ %s }", c)
+}
+
+func (p *Projects) AddAttributes(prj_id string, env string, lifecycle string, criticality string) error {
+	err := ParseAttributes(env, lifecycle, criticality)
+	if err != nil {
+		return err
+	}
+
+	attrBody := BuildAttributesBody(env, lifecycle, criticality)
 
 	var jsonStr = []byte(attrBody)
 
@@ -332,4 +340,15 @@ func ParseTags(filterTag []string) (map[string]string, error) {
 	}
 
 	return mTags, nil
+}
+
+func (p *Projects) DeleteProject(prj_id string) error {
+	path := fmt.Sprintf(projectPath, p.Org.Id, prj_id)
+	resp := p.client.RequestDelete(path)
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("GetProjects failed: %s", resp.Status)
+	}
+	return nil
 }
