@@ -156,3 +156,32 @@ func Test_AddTag_KO(t *testing.T) {
 	expectedErrorMsg := "failed to add tag XXX"
 	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
 }
+
+type testDataAttributes struct {
+	env         string
+	lifecycle   string
+	criticality string
+	errorMsg    string
+}
+
+func Test_ParseAttributes(t *testing.T) {
+	tests := []testDataAttributes{
+		testDataAttributes{env: "frontend", lifecycle: "", criticality: "", errorMsg: ""},
+		testDataAttributes{env: "xxx", lifecycle: "", criticality: "", errorMsg: "invalid environment value: xxx\nValid values: [frontend backend internal external mobile saas on-prem hosted distributed]"},
+		testDataAttributes{env: "", lifecycle: "production", criticality: "", errorMsg: ""},
+		testDataAttributes{env: "", lifecycle: "xxx", criticality: "", errorMsg: "invalid lifecycle value: xxx\nValid values: [production development sandbox]"},
+		testDataAttributes{env: "", lifecycle: "", criticality: "high", errorMsg: ""},
+		testDataAttributes{env: "", lifecycle: "", criticality: "xxx", errorMsg: "invalid lifecycle value: xxx\nValid values: [critical high medium low]"},
+		testDataAttributes{env: "frontend", lifecycle: "production", criticality: "medium", errorMsg: ""},
+		testDataAttributes{env: "xxx", lifecycle: "xxx", criticality: "xxx", errorMsg: "invalid environment value: xxx\nValid values: [frontend backend internal external mobile saas on-prem hosted distributed]"},
+	}
+	// var err error
+	for _, test := range tests {
+		err := ParseAttributes(test.env, test.lifecycle, test.criticality)
+		if err == nil {
+			assert.Equal(t, test.errorMsg, "")
+		} else {
+			assert.EqualErrorf(t, err, test.errorMsg, "Error should be: %v, got: %v", test.errorMsg, err)
+		}
+	}
+}
