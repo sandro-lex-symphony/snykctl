@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"snykctl/internal/config"
 	"snykctl/internal/tools"
 )
 
@@ -120,8 +121,8 @@ func (u Users) Sync() bool {
 	return u.sync
 }
 
-func AddUser(client tools.HttpClient, group_id, org_id, user_id, role string) error {
-	path := fmt.Sprintf(addUserPath, group_id, org_id)
+func AddUser(client tools.HttpClient, org_id, user_id, role string) error {
+	path := fmt.Sprintf(addUserPath, config.Instance.Id(), org_id)
 	jsonValue, _ := json.Marshal(map[string]string{
 		"userId": user_id,
 		"role":   role,
@@ -141,6 +142,23 @@ func DeleteUser(client tools.HttpClient, org_id, user_id string) error {
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("deleteUsers failed: %s", resp.Status)
+	}
+
+	return nil
+}
+
+func CopyUsers(client tools.HttpClient, org1, org2 string) error {
+	users1 := NewUsers(client, org1)
+	err := users1.Get()
+	if err != nil {
+		return err
+	}
+
+	for _, user := range users1.Users {
+		err = AddUser(client, org2, user.Id, "collaborator")
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

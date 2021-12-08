@@ -24,18 +24,21 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// addUserCmd represents the addUser command
-var addUserCmd = &cobra.Command{
-	Use:   "addUser",
-	Short: "Adds an existing user to an Org",
-	Long: `Adds an existing user to an Org. For example:
-snykclt addUser group_id org_id user_id
-`,
+// copyUsersCmd represents the copyUsers command
+var copyUsersCmd = &cobra.Command{
+	Use:   "copyUsers",
+	Short: "A brief description of your command",
+	Long: `A longer description that spans multiple lines and likely contains examples
+and usage of using your command. For example:
+
+Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.`,
 	Args: cobra.MinimumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, debug)
 
-		err := domain.AddUser(client, args[0], args[1], "collaborator")
+		err := domain.CopyUsers(client, args[0], args[1])
 		if err != nil {
 			return err
 		}
@@ -45,5 +48,15 @@ snykclt addUser group_id org_id user_id
 }
 
 func init() {
-	rootCmd.AddCommand(addUserCmd)
+	rootCmd.AddCommand(copyUsersCmd)
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// copyUsersCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// copyUsersCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
