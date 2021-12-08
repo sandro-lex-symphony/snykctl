@@ -30,12 +30,18 @@ type Project struct {
 	Name       string
 	Id         string
 	Attributes Attributes
+	Tags       []*Tag
 }
 
 type Attributes struct {
 	Criticality []string
 	Environment []string
 	Lifecycle   []string
+}
+
+type Tag struct {
+	Key   string
+	Value string
 }
 
 func NewProjects(c tools.HttpClient, org_id string) *Projects {
@@ -199,6 +205,16 @@ func (p *Projects) toString(filter string) (string, error) {
 			}
 			if len(prj.Attributes.Lifecycle) > 0 {
 				attrs = append(attrs, prj.Attributes.Lifecycle[0])
+			}
+			if len(prj.Tags) > 0 {
+				var attrTags []string
+				for _, tag := range prj.Tags {
+					t := fmt.Sprintf("%s=%s", tag.Key, tag.Value)
+					attrTags = append(attrTags, t)
+				}
+				tagsStr := strings.Join(attrTags, ",")
+				tagsStr = "[" + tagsStr + "]"
+				attrs = append(attrs, tagsStr)
 			}
 			attributes := strings.Join(attrs, ",")
 			ret += fmt.Sprintf("%-38s %-50s%s\n", prj.Id, prj.Name, attributes)
