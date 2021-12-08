@@ -75,7 +75,7 @@ Example:
 			}
 		}
 
-		prjs.Print(quiet, names)
+		prjs.Print(quiet, names, verbose)
 		return nil
 	},
 }
@@ -86,6 +86,7 @@ func init() {
 	getProjectsCmd.PersistentFlags().BoolVarP(&quiet, "quiet", "q", false, "Prints only ids")
 	getProjectsCmd.PersistentFlags().BoolVarP(&names, "names", "n", false, "Prints only names")
 	getProjectsCmd.PersistentFlags().BoolVarP(&rawOutput, "raw", "r", false, "Prints raw json output from api")
+	getProjectsCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Prints verbose (includes attributes and tags)")
 
 	getProjectsCmd.PersistentFlags().StringVarP(&attrEnvironment, "env", "", "", "Filters by environment [frontend | backend | internal | external | mobile | saas | on-prem | hosted | distributed]")
 	getProjectsCmd.PersistentFlags().StringVarP(&attrLifecycle, "lifecycle", "", "", "Filters by lifecycle [production | development | sandbox]")

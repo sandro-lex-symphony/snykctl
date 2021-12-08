@@ -24,6 +24,7 @@ import (
 var cfgFile string
 var debug bool
 var quiet bool
+var verbose bool
 var names bool
 var rawOutput bool
 var attrEnvironment string

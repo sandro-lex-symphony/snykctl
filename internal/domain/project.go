@@ -27,8 +27,15 @@ type Projects struct {
 }
 
 type Project struct {
-	Name string
-	Id   string
+	Name       string
+	Id         string
+	Attributes Attributes
+}
+
+type Attributes struct {
+	Criticality []string
+	Environment []string
+	Lifecycle   []string
 }
 
 func NewProjects(c tools.HttpClient, org_id string) *Projects {
@@ -171,14 +178,30 @@ func (p *Projects) Names() (string, error) {
 	return p.toString("name")
 }
 
-func (p *Projects) toString(filter string) (string, error) {
+func (p *Projects) Verbose() (string, error) {
+	return p.toString("verbose")
+}
 
+func (p *Projects) toString(filter string) (string, error) {
 	var ret string
 	for _, prj := range p.Projects {
 		if filter == "id" {
 			ret += fmt.Sprintf("%s\n", prj.Id)
 		} else if filter == "name" {
 			ret += fmt.Sprintf("%s\n", prj.Name)
+		} else if filter == "verbose" {
+			var attrs []string
+			if len(prj.Attributes.Criticality) > 0 {
+				attrs = append(attrs, prj.Attributes.Criticality[0])
+			}
+			if len(prj.Attributes.Environment) > 0 {
+				attrs = append(attrs, prj.Attributes.Environment[0])
+			}
+			if len(prj.Attributes.Lifecycle) > 0 {
+				attrs = append(attrs, prj.Attributes.Lifecycle[0])
+			}
+			attributes := strings.Join(attrs, ",")
+			ret += fmt.Sprintf("%-38s %-50s%s\n", prj.Id, prj.Name, attributes)
 		} else {
 			ret += fmt.Sprintf("%-38s %s\n", prj.Id, prj.Name)
 		}
@@ -186,12 +209,14 @@ func (p *Projects) toString(filter string) (string, error) {
 	return ret, nil
 }
 
-func (p Projects) Print(quiet, names bool) {
+func (p Projects) Print(quiet, names, verbose bool) {
 	var out string
 	if quiet {
 		out, _ = p.Quiet()
 	} else if names {
 		out, _ = p.Names()
+	} else if verbose {
+		out, _ = p.Verbose()
 	} else {
 		out, _ = p.String()
 	}
