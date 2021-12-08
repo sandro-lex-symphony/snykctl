@@ -26,9 +26,10 @@ var debug bool
 var quiet bool
 var names bool
 var rawOutput bool
-var filterLifecycle string
-var filterEnvironment string
-var filterTag []string
+var attrEnvironment string
+var attrLifecycle string
+var attrCriticality string
+var attrTag []string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -68,27 +69,5 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-
 	config.Instance.Init(true)
-
-	// if cfgFile != "" {
-	// 	// Use config file from the flag.
-	// 	viper.SetConfigFile(cfgFile)
-	// } else {
-	// 	// Find home directory.
-	// 	home, err := os.UserHomeDir()
-	// 	cobra.CheckErr(err)
-
-	// 	// Search config in home directory with name ".snykctl" (without extension).
-	// 	viper.AddConfigPath(home)
-	// 	viper.SetConfigType("yaml")
-	// 	viper.SetConfigName(".snykctl")
-	// }
-
-	// viper.AutomaticEnv() // read in environment variables that match
-
-	// // If a config file is found, read it in.
-	// if err := viper.ReadInConfig(); err == nil {
-	// 	fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
-	// }
 }

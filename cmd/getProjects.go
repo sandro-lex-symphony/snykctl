@@ -54,14 +54,17 @@ Example:
 		}
 
 		if checkAtLeastOneFilterSet() {
-			err := domain.ParseAttributes(filterEnvironment, filterLifecycle, "")
+			err := domain.ParseAttributes(attrEnvironment, attrLifecycle, attrCriticality)
 			if err != nil {
 				return err
 			}
 
-			mTags, err := domain.ParseTags(filterTag)
+			mTags, err := domain.ParseTags(attrTag)
+			if err != nil {
+				return err
+			}
 
-			err = prjs.GetFiltered(filterEnvironment, filterLifecycle, mTags)
+			err = prjs.GetFiltered(attrEnvironment, attrLifecycle, attrCriticality, mTags)
 			if err != nil {
 				return err
 			}
@@ -84,13 +87,14 @@ func init() {
 	getProjectsCmd.PersistentFlags().BoolVarP(&names, "names", "n", false, "Prints only names")
 	getProjectsCmd.PersistentFlags().BoolVarP(&rawOutput, "raw", "r", false, "Prints raw json output from api")
 
-	getProjectsCmd.PersistentFlags().StringVarP(&filterEnvironment, "env", "", "", "Filters by environment (frontend | backend | internal | external | mobile | saas | on-prem | hosted | distributed)")
-	getProjectsCmd.PersistentFlags().StringVarP(&filterLifecycle, "lifecycle", "", "", "Filters by lifecycle (production | development | sandbox)")
-	getProjectsCmd.PersistentFlags().StringSliceVarP(&filterTag, "tag", "", []string{}, "Filters by tag (key1=value1;key2=value2)")
+	getProjectsCmd.PersistentFlags().StringVarP(&attrEnvironment, "env", "", "", "Filters by environment [frontend | backend | internal | external | mobile | saas | on-prem | hosted | distributed]")
+	getProjectsCmd.PersistentFlags().StringVarP(&attrLifecycle, "lifecycle", "", "", "Filters by lifecycle [production | development | sandbox]")
+	getProjectsCmd.PersistentFlags().StringVarP(&attrCriticality, "criticality", "", "", "Filters by criticality [critical | high | medium | low]")
+	getProjectsCmd.PersistentFlags().StringSliceVarP(&attrTag, "tag", "", []string{}, "Filters by tag (key1=value1;key2=value2)")
 }
 
 func checkAtLeastOneFilterSet() bool {
-	if filterEnvironment != "" || filterLifecycle != "" || len(filterTag) > 0 {
+	if attrEnvironment != "" || attrLifecycle != "" || attrCriticality != "" || len(attrTag) > 0 {
 		return true
 	}
 	return false

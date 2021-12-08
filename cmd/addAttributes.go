@@ -27,18 +27,20 @@ import (
 // addAttributesCmd represents the addAttributes command
 var addAttributesCmd = &cobra.Command{
 	Use:   "addAttributes",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Add attributes to projects",
+	Long: `Attributes are static and non-configurable fields which allow to add additional metadata to a project. 
+	Attributes have a pre-defined list of values that a user can select from.
+	--env [frontend | backend | internal ...]
+	--lifecycle [production | development | sandbox ]
+	--criticality [critical | high | medium | low ]
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	snykctl addAttributes --env frontend org_id prj_id
+`,
 	Args: cobra.MinimumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, false)
 		prjs := domain.NewProjects(client, args[0])
-		err := prjs.AddAttributes(args[1], filterEnvironment, filterLifecycle, "")
+		err := prjs.AddAttributes(args[1], attrEnvironment, attrLifecycle, attrCriticality)
 		if err != nil {
 			return err
 		}
@@ -50,7 +52,8 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(addAttributesCmd)
-	addAttributesCmd.PersistentFlags().StringVarP(&filterEnvironment, "env", "", "", "Filters by environment (frontend | backend | internal | external | mobile | saas | on-prem | hosted | distributed)")
-	addAttributesCmd.PersistentFlags().StringVarP(&filterLifecycle, "lifecycle", "", "", "Filters by lifecycle (production | development | sandbox)")
+	addAttributesCmd.PersistentFlags().StringVarP(&attrEnvironment, "env", "", "", "Environment (frontend | backend | internal | external | mobile | saas | on-prem | hosted | distributed)")
+	addAttributesCmd.PersistentFlags().StringVarP(&attrLifecycle, "lifecycle", "", "", "Lifecycle (production | development | sandbox)")
+	addAttributesCmd.PersistentFlags().StringVarP(&attrCriticality, "criticality", "", "", "Criticality [critical | high | medium | low]")
 
 }

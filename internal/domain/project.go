@@ -95,25 +95,30 @@ func (p *Projects) baseGet(raw bool, path string) error {
 	return nil
 }
 
-func (p *Projects) GetFiltered(env string, lifecycle string, mTags map[string]string) error {
+func (p *Projects) GetFiltered(env string, lifecycle string, criticality string, mTags map[string]string) error {
 	path := fmt.Sprintf(projectsPath, p.Org.Id)
 
-	var attributes, filterContent, tags string
+	var attributesContent, attributes, filterContent, tags string
 
-	if lifecycle != "" || env != "" {
-		attributes += ` "attributes": { `
+	if lifecycle != "" || env != "" || criticality != "" {
+		var attrs []string
 
 		if lifecycle != "" {
-			attributes += fmt.Sprintf(`"lifecycle": [ "%s" ]`, lifecycle)
+			at := fmt.Sprintf(`"lifecycle": [ "%s" ]`, lifecycle)
+			attrs = append(attrs, at)
 		}
-		if lifecycle != "" && env != "" {
-			attributes += ","
+		if env != "" {
+			at := fmt.Sprintf(`"environment": [ "%s" ]`, env)
+			attrs = append(attrs, at)
 		}
 
-		if env != "" {
-			attributes += fmt.Sprintf(`"environment": [ "%s" ]`, env)
+		if criticality != "" {
+			at := fmt.Sprintf(`"criticality": [ "%s" ]`, criticality)
+			attrs = append(attrs, at)
 		}
-		attributes += " }"
+
+		attributes = strings.Join(attrs, ",")
+		attributesContent = fmt.Sprintf(`"attributes": { %s }`, attributes)
 	}
 
 	if len(mTags) > 0 {
@@ -128,10 +133,10 @@ func (p *Projects) GetFiltered(env string, lifecycle string, mTags map[string]st
 		tags += "] }"
 	}
 
-	if attributes != "" && tags != "" {
-		filterContent = attributes + ", " + tags
-	} else if attributes != "" {
-		filterContent = attributes
+	if attributesContent != "" && tags != "" {
+		filterContent = attributesContent + ", " + tags
+	} else if attributesContent != "" {
+		filterContent = attributesContent
 	} else {
 		filterContent = tags
 	}
@@ -217,7 +222,7 @@ func (p *Projects) AddAttributes(prj_id string, env string, lifecycle string, cr
 		values = append(values, value)
 	}
 	c := strings.Join(values, ",")
-	attrBody := fmt.Sprintf("{%s}", c)
+	attrBody := fmt.Sprintf("{ %s }", c)
 
 	var jsonStr = []byte(attrBody)
 
