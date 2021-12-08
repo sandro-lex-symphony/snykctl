@@ -36,7 +36,7 @@ func Test_Project_Get_badBody(t *testing.T) {
 
 func Test_Project_Get_Ok(t *testing.T) {
 	client := tools.NewMockClient()
-	client.ResponseBody = `{"org":{"name":"Sandbox","id":"16df2e12-d4cb-400d-aaf2-547db9ff07e9"},"projects":[{"id":"5c8e7160-5b60-4f49-824f-c01c891ea29f","name":"com.symphony.is:zoom-frontend","created":"2021-11-22T10:03:05.435Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":0,"issueCountsBySeverity":{"low":0,"high":0,"medium":0,"critical":0},"remoteRepoUrl":"http://github.com/SymphonyOSF/sms-zoom.git","imageTag":"1.0.0-SNAPSHOT","lastTestedDate":"2021-12-05T06:20:50.043Z","browseUrl":"https://app.snyk.io/org/sandbox-pie/project/5c8e7160-5b60-4f49-824f-c01c891ea29f","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41fcc29","name":"sandbox","username":"sandbox","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null},{"id":"9931b808-9f92-4283-a8aa-d96289e363bd","name":"com.symphony:cmd-mock-conveyor","created":"2021-11-19T13:45:23.001Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":152,"issueCountsBySeverity":{"low":0,"high":3,"medium":4,"critical":0},"remoteRepoUrl":"http://github.com/SymphonyOSF/command-middleware.git","imageTag":"0.0.1-SNAPSHOT","lastTestedDate":"2021-12-05T05:43:10.379Z","browseUrl":"https://app.snyk.io/org/sandbox-pie/project/9931b808-9f92-4283-a8aa-d96289e363bd","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41fcc29","name":"sandbox","username":"sandbox","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null}]}"`
+	client.ResponseBody = `{"org":{"name":"org-test","id":"16df2e12-d4cb-4111-aaf2-547db9ff07e9"},"projects":[{"id":"5c8e7160-5b60-4f49-824f-c01c111ea29f","name":"prj1:front","created":"2021-11-22T10:03:05.435Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":0,"issueCountsBySeverity":{"low":0,"high":0,"medium":0,"critical":0},"remoteRepoUrl":"http://example.com/repot/prj1.git","imageTag":"1.0.0-SNAPSHOT","lastTestedDate":"2021-12-05T06:20:50.043Z","browseUrl":"https://app.snyk.io/org/org-test-pie/project/5c8e7160-5b60-4f49-824f-c01c111ea29f","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41f1111","name":"org-test","username":"org-test","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null},{"id":"9931b808-9f92-4283-a8aa-d96289e11111","name":"com.example:cmd-mock-conxxx","created":"2021-11-19T13:45:23.001Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":152,"issueCountsBySeverity":{"low":0,"high":3,"medium":4,"critical":0},"remoteRepoUrl":"http://example.com/repo/prj2.git","imageTag":"0.0.1-SNAPSHOT","lastTestedDate":"2021-12-05T05:43:10.379Z","browseUrl":"https://app.snyk.io/org/org-test-pie/project/9931b808-9f92-4283-a8aa-d96289e11111","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41f1111","name":"org-test","username":"org-test","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null}]}"`
 	client.StatusCode = http.StatusOK
 	client.Status = "XXX"
 	prjs := NewProjects(client, "org_id")
@@ -48,13 +48,13 @@ func Test_Project_Get_Ok(t *testing.T) {
 
 	assert.Equal(t, 2, len(prjs.Projects))
 	// id is read from json output
-	assert.Equal(t, "16df2e12-d4cb-400d-aaf2-547db9ff07e9", prjs.Org.Id)
+	assert.Equal(t, "16df2e12-d4cb-4111-aaf2-547db9ff07e9", prjs.Org.Id)
 
 	var idFound bool
 	for _, o := range prjs.Projects {
-		if o.Id == "5c8e7160-5b60-4f49-824f-c01c891ea29f" {
+		if o.Id == "5c8e7160-5b60-4f49-824f-c01c111ea29f" {
 			idFound = true
-			assert.Equal(t, "com.symphony.is:zoom-frontend", o.Name)
+			assert.Equal(t, "prj1:front", o.Name)
 		}
 	}
 
@@ -63,7 +63,7 @@ func Test_Project_Get_Ok(t *testing.T) {
 
 func Test_Project_Get_Ids(t *testing.T) {
 	client := tools.NewMockClient()
-	client.ResponseBody = `{"org":{"name":"Sandbox","id":"16df2e12-d4cb-400d-aaf2-547db9ff07e9"},"projects":[{"id":"5c8e7160-5b60-4f49-824f-c01c891ea29f","name":"com.symphony.is:zoom-frontend","created":"2021-11-22T10:03:05.435Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":0,"issueCountsBySeverity":{"low":0,"high":0,"medium":0,"critical":0},"remoteRepoUrl":"http://github.com/SymphonyOSF/sms-zoom.git","imageTag":"1.0.0-SNAPSHOT","lastTestedDate":"2021-12-05T06:20:50.043Z","browseUrl":"https://app.snyk.io/org/sandbox-pie/project/5c8e7160-5b60-4f49-824f-c01c891ea29f","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41fcc29","name":"sandbox","username":"sandbox","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null},{"id":"9931b808-9f92-4283-a8aa-d96289e363bd","name":"com.symphony:cmd-mock-conveyor","created":"2021-11-19T13:45:23.001Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":152,"issueCountsBySeverity":{"low":0,"high":3,"medium":4,"critical":0},"remoteRepoUrl":"http://github.com/SymphonyOSF/command-middleware.git","imageTag":"0.0.1-SNAPSHOT","lastTestedDate":"2021-12-05T05:43:10.379Z","browseUrl":"https://app.snyk.io/org/sandbox-pie/project/9931b808-9f92-4283-a8aa-d96289e363bd","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41fcc29","name":"sandbox","username":"sandbox","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null}]}"`
+	client.ResponseBody = `{"org":{"name":"org-test","id":"16df2e12-d4cb-4111-aaf2-547db9ff07e9"},"projects":[{"id":"5c8e7160-5b60-4f49-824f-c01c111ea29f","name":"prj1:front","created":"2021-11-22T10:03:05.435Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":0,"issueCountsBySeverity":{"low":0,"high":0,"medium":0,"critical":0},"remoteRepoUrl":"http://example.com/repot/prj1.git","imageTag":"1.0.0-SNAPSHOT","lastTestedDate":"2021-12-05T06:20:50.043Z","browseUrl":"https://app.snyk.io/org/org-test-pie/project/5c8e7160-5b60-4f49-824f-c01c111ea29f","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41f1111","name":"org-test","username":"org-test","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null},{"id":"9931b808-9f92-4283-a8aa-d96289e11111","name":"com.example:cmd-mock-conxxx","created":"2021-11-19T13:45:23.001Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":152,"issueCountsBySeverity":{"low":0,"high":3,"medium":4,"critical":0},"remoteRepoUrl":"http://example.com/repo/prj2.git","imageTag":"0.0.1-SNAPSHOT","lastTestedDate":"2021-12-05T05:43:10.379Z","browseUrl":"https://app.snyk.io/org/org-test-pie/project/9931b808-9f92-4283-a8aa-d96289e11111","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41f1111","name":"org-test","username":"org-test","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null}]}"`
 	client.StatusCode = http.StatusOK
 	client.Status = "XXX"
 	prjs := NewProjects(client, "org_id")
@@ -75,9 +75,9 @@ func Test_Project_Get_Ids(t *testing.T) {
 
 	assert.Equal(t, 2, len(prjs.Projects))
 	// id is read from json output
-	assert.Equal(t, "16df2e12-d4cb-400d-aaf2-547db9ff07e9", prjs.Org.Id)
+	assert.Equal(t, "16df2e12-d4cb-4111-aaf2-547db9ff07e9", prjs.Org.Id)
 
-	expected := "5c8e7160-5b60-4f49-824f-c01c891ea29f\n9931b808-9f92-4283-a8aa-d96289e363bd\n"
+	expected := "5c8e7160-5b60-4f49-824f-c01c111ea29f\n9931b808-9f92-4283-a8aa-d96289e11111\n"
 	actual, err := prjs.Quiet()
 
 	assert.Nil(t, err)
@@ -87,7 +87,7 @@ func Test_Project_Get_Ids(t *testing.T) {
 
 func Test_Project_Get_Names(t *testing.T) {
 	client := tools.NewMockClient()
-	client.ResponseBody = `{"org":{"name":"Sandbox","id":"16df2e12-d4cb-400d-aaf2-547db9ff07e9"},"projects":[{"id":"5c8e7160-5b60-4f49-824f-c01c891ea29f","name":"com.symphony.is:zoom-frontend","created":"2021-11-22T10:03:05.435Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":0,"issueCountsBySeverity":{"low":0,"high":0,"medium":0,"critical":0},"remoteRepoUrl":"http://github.com/SymphonyOSF/sms-zoom.git","imageTag":"1.0.0-SNAPSHOT","lastTestedDate":"2021-12-05T06:20:50.043Z","browseUrl":"https://app.snyk.io/org/sandbox-pie/project/5c8e7160-5b60-4f49-824f-c01c891ea29f","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41fcc29","name":"sandbox","username":"sandbox","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null},{"id":"9931b808-9f92-4283-a8aa-d96289e363bd","name":"com.symphony:cmd-mock-conveyor","created":"2021-11-19T13:45:23.001Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":152,"issueCountsBySeverity":{"low":0,"high":3,"medium":4,"critical":0},"remoteRepoUrl":"http://github.com/SymphonyOSF/command-middleware.git","imageTag":"0.0.1-SNAPSHOT","lastTestedDate":"2021-12-05T05:43:10.379Z","browseUrl":"https://app.snyk.io/org/sandbox-pie/project/9931b808-9f92-4283-a8aa-d96289e363bd","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41fcc29","name":"sandbox","username":"sandbox","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null}]}"`
+	client.ResponseBody = `{"org":{"name":"org-test","id":"16df2e12-d4cb-4111-aaf2-547db9ff07e9"},"projects":[{"id":"5c8e7160-5b60-4f49-824f-c01c111ea29f","name":"prj1:front","created":"2021-11-22T10:03:05.435Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":0,"issueCountsBySeverity":{"low":0,"high":0,"medium":0,"critical":0},"remoteRepoUrl":"http://example.com/repot/prj1.git","imageTag":"1.0.0-SNAPSHOT","lastTestedDate":"2021-12-05T06:20:50.043Z","browseUrl":"https://app.snyk.io/org/org-test-pie/project/5c8e7160-5b60-4f49-824f-c01c111ea29f","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41f1111","name":"org-test","username":"org-test","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null},{"id":"9931b808-9f92-4283-a8aa-d96289e11111","name":"com.example:cmd-mock-conxxx","created":"2021-11-19T13:45:23.001Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":152,"issueCountsBySeverity":{"low":0,"high":3,"medium":4,"critical":0},"remoteRepoUrl":"http://example.com/repo/prj2.git","imageTag":"0.0.1-SNAPSHOT","lastTestedDate":"2021-12-05T05:43:10.379Z","browseUrl":"https://app.snyk.io/org/org-test-pie/project/9931b808-9f92-4283-a8aa-d96289e11111","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41f1111","name":"org-test","username":"org-test","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null}]}"`
 	client.StatusCode = http.StatusOK
 	client.Status = "XXX"
 	prjs := NewProjects(client, "org_id")
@@ -99,10 +99,34 @@ func Test_Project_Get_Names(t *testing.T) {
 
 	assert.Equal(t, 2, len(prjs.Projects))
 	// id is read from json output
-	assert.Equal(t, "16df2e12-d4cb-400d-aaf2-547db9ff07e9", prjs.Org.Id)
+	assert.Equal(t, "16df2e12-d4cb-4111-aaf2-547db9ff07e9", prjs.Org.Id)
 
-	expected := "com.symphony.is:zoom-frontend\ncom.symphony:cmd-mock-conveyor\n"
+	expected := "prj1:front\ncom.example:cmd-mock-conxxx\n"
 	actual, err := prjs.Names()
+
+	assert.Nil(t, err)
+	assert.Equal(t, expected, actual)
+
+}
+
+func Test_Project_Get_String(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = `{"org":{"name":"org-test","id":"16df2e12-d4cb-4111-aaf2-547db9ff07e9"},"projects":[{"id":"5c8e7160-5b60-4f49-824f-c01c111ea29f","name":"prj1:front","created":"2021-11-22T10:03:05.435Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":0,"issueCountsBySeverity":{"low":0,"high":0,"medium":0,"critical":0},"remoteRepoUrl":"http://example.com/repot/prj1.git","imageTag":"1.0.0-SNAPSHOT","lastTestedDate":"2021-12-05T06:20:50.043Z","browseUrl":"https://app.snyk.io/org/org-test-pie/project/5c8e7160-5b60-4f49-824f-c01c111ea29f","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41f1111","name":"org-test","username":"org-test","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null},{"id":"9931b808-9f92-4283-a8aa-d96289e11111","name":"com.example:cmd-mock-conxxx","created":"2021-11-19T13:45:23.001Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":152,"issueCountsBySeverity":{"low":0,"high":3,"medium":4,"critical":0},"remoteRepoUrl":"http://example.com/repo/prj2.git","imageTag":"0.0.1-SNAPSHOT","lastTestedDate":"2021-12-05T05:43:10.379Z","browseUrl":"https://app.snyk.io/org/org-test-pie/project/9931b808-9f92-4283-a8aa-d96289e11111","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41f1111","name":"org-test","username":"org-test","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null}]}"`
+	client.StatusCode = http.StatusOK
+	client.Status = "XXX"
+	prjs := NewProjects(client, "org_id")
+
+	err := prjs.Get()
+
+	assert.Equal(t, nil, err)
+	assert.Equal(t, true, prjs.IsSync())
+
+	assert.Equal(t, 2, len(prjs.Projects))
+	// id is read from json output
+	assert.Equal(t, "16df2e12-d4cb-4111-aaf2-547db9ff07e9", prjs.Org.Id)
+
+	expected := "5c8e7160-5b60-4f49-824f-c01c111ea29f   prj1:front\n9931b808-9f92-4283-a8aa-d96289e11111   com.example:cmd-mock-conxxx\n"
+	actual, err := prjs.String()
 
 	assert.Nil(t, err)
 	assert.Equal(t, expected, actual)
@@ -111,7 +135,7 @@ func Test_Project_Get_Names(t *testing.T) {
 
 func Test_Project_Get_Raw(t *testing.T) {
 	client := tools.NewMockClient()
-	raw := `{"org":{"name":"Sandbox","id":"16df2e12-d4cb-400d-aaf2-547db9ff07e9"},"projects":[{"id":"5c8e7160-5b60-4f49-824f-c01c891ea29f","name":"com.symphony.is:zoom-frontend","created":"2021-11-22T10:03:05.435Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":0,"issueCountsBySeverity":{"low":0,"high":0,"medium":0,"critical":0},"remoteRepoUrl":"http://github.com/SymphonyOSF/sms-zoom.git","imageTag":"1.0.0-SNAPSHOT","lastTestedDate":"2021-12-05T06:20:50.043Z","browseUrl":"https://app.snyk.io/org/sandbox-pie/project/5c8e7160-5b60-4f49-824f-c01c891ea29f","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41fcc29","name":"sandbox","username":"sandbox","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null},{"id":"9931b808-9f92-4283-a8aa-d96289e363bd","name":"com.symphony:cmd-mock-conveyor","created":"2021-11-19T13:45:23.001Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":152,"issueCountsBySeverity":{"low":0,"high":3,"medium":4,"critical":0},"remoteRepoUrl":"http://github.com/SymphonyOSF/command-middleware.git","imageTag":"0.0.1-SNAPSHOT","lastTestedDate":"2021-12-05T05:43:10.379Z","browseUrl":"https://app.snyk.io/org/sandbox-pie/project/9931b808-9f92-4283-a8aa-d96289e363bd","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41fcc29","name":"sandbox","username":"sandbox","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null}]}"`
+	raw := `{"org":{"name":"org-test","id":"16df2e12-d4cb-4111-aaf2-547db9ff07e9"},"projects":[{"id":"5c8e7160-5b60-4f49-824f-c01c111ea29f","name":"prj1:front","created":"2021-11-22T10:03:05.435Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":0,"issueCountsBySeverity":{"low":0,"high":0,"medium":0,"critical":0},"remoteRepoUrl":"http://example.com/repot/prj1.git","imageTag":"1.0.0-SNAPSHOT","lastTestedDate":"2021-12-05T06:20:50.043Z","browseUrl":"https://app.snyk.io/org/org-test-pie/project/5c8e7160-5b60-4f49-824f-c01c111ea29f","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41f1111","name":"org-test","username":"org-test","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null},{"id":"9931b808-9f92-4283-a8aa-d96289e11111","name":"com.example:cmd-mock-conxxx","created":"2021-11-19T13:45:23.001Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":152,"issueCountsBySeverity":{"low":0,"high":3,"medium":4,"critical":0},"remoteRepoUrl":"http://example.com/repo/prj2.git","imageTag":"0.0.1-SNAPSHOT","lastTestedDate":"2021-12-05T05:43:10.379Z","browseUrl":"https://app.snyk.io/org/org-test-pie/project/9931b808-9f92-4283-a8aa-d96289e11111","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41f1111","name":"org-test","username":"org-test","email":null},"tags":[],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"branch":null}]}"`
 	client.ResponseBody = raw
 	client.StatusCode = http.StatusOK
 	client.Status = "XXX"
@@ -230,4 +254,18 @@ func Test_Build_AttributesBody(t *testing.T) {
 		body := BuildAttributesBody(test.env, test.lifecycle, test.criticality)
 		assert.Equal(t, test.body, body)
 	}
+}
+
+func Test_GetProject_OK(t *testing.T) {
+	client := tools.NewMockClient()
+	raw := `{"name":"prj1:front","id":"5c8e7160-5b60-4f49-824f-c01c111ea29f","created":"2021-11-22T10:03:05.435Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","totalDependencies":0,"issueCountsBySeverity":{"low":0,"high":0,"medium":0,"critical":0},"remoteRepoUrl":"http://example.com/repot/prj1.git","imageTag":"1.0.0-SNAPSHOT","hostname":"slex-mbp","lastTestedDate":"2021-12-08T10:13:19.059Z","browseUrl":"https://app.snyk.io/org/org-test-pie/project/5c8e7160-5b60-4f49-824f-c01c111ea29f","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41f1111","name":"org-test","username":"org-test","email":null},"isMonitored":true,"tags":[{"key":"key2","value":"value4"},{"key":"key2","value":"value2"},{"key":"key","value":"value"}],"attributes":{"criticality":[],"lifecycle":[],"environment":[]},"remediation":{"pin":{},"patch":{},"upgrade":{}},"branch":null}`
+	client.ResponseBody = raw
+	client.StatusCode = http.StatusOK
+	client.Status = "XXX"
+	prjs := NewProjects(client, "org_id")
+
+	out, err := prjs.GetRawProject("prj_id")
+
+	assert.Nil(t, err)
+	assert.Equal(t, raw, out)
 }

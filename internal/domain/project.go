@@ -70,10 +70,10 @@ func (p *Projects) Get() error {
 	return p.baseGet(false, path)
 }
 
-func (p *Projects) GetProject(prj_id string) error {
-	path := fmt.Sprintf(projectPath, p.Org.Id, prj_id)
-	return p.baseGet(false, path)
-}
+// func (p *Projects) GetProject(prj_id string) error {
+// 	path := fmt.Sprintf(projectPath, p.Org.Id, prj_id)
+// 	return p.baseGet(false, path)
+// }
 
 func (p *Projects) GetRawProject(prj_id string) (string, error) {
 	path := fmt.Sprintf(projectPath, p.Org.Id, prj_id)
