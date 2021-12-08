@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
 	"snykctl/internal/config"
 	"snykctl/internal/domain"
 	"snykctl/internal/tools"
@@ -23,26 +24,29 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// compareUsersCmd represents the compareUsers command
-var compareUsersCmd = &cobra.Command{
-	Use:   "compareUsers",
-	Short: "Compare users from two orgs",
-	Long: `Compares the users from two orgs For example:
-snykctl compareUsers org1 org2
-`,
+// deleteUserCmd represents the deleteUser command
+var deleteUserCmd = &cobra.Command{
+	Use:   "deleteUser",
+	Short: "A brief description of your command",
+	Long: `A longer description that spans multiple lines and likely contains examples
+and usage of using your command. For example:
+
+Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.`,
 	Args: cobra.MinimumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, debug)
 
-		err := domain.CompareUsers(client, args[0], args[1])
+		err := domain.DeleteUser(client, args[0], args[1])
 		if err != nil {
 			return err
 		}
-
+		fmt.Println("OK")
 		return nil
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(compareUsersCmd)
+	rootCmd.AddCommand(deleteUserCmd)
 }

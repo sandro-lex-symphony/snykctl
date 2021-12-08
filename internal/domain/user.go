@@ -10,6 +10,8 @@ import (
 
 const membersPath = "/org/%s/members"
 const groupMembersPath = "/group/%s/members"
+const addUserPath = "/group/%s/org/%s/members"
+const deleteUserPath = "/org/%s/members/%s"
 
 type Users struct {
 	Users       []*User
@@ -116,4 +118,30 @@ func (u Users) toString(filter string) string {
 
 func (u Users) Sync() bool {
 	return u.sync
+}
+
+func AddUser(client tools.HttpClient, group_id, org_id, user_id, role string) error {
+	path := fmt.Sprintf(addUserPath, group_id, org_id)
+	jsonValue, _ := json.Marshal(map[string]string{
+		"userId": user_id,
+		"role":   role,
+	})
+	resp := client.RequestPost(path, jsonValue)
+	if resp.StatusCode != http.StatusOK {
+		resp.Body.Close()
+		return fmt.Errorf("add User failed: %s ", resp.Status)
+	}
+	return nil
+}
+
+func DeleteUser(client tools.HttpClient, org_id, user_id string) error {
+	path := fmt.Sprintf(deleteUserPath, org_id, user_id)
+	resp := client.RequestDelete(path)
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("deleteUsers failed: %s", resp.Status)
+	}
+
+	return nil
 }

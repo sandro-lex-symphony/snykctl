@@ -27,7 +27,7 @@ import (
 // deleteProjectCmd represents the deleteProject command
 var deleteProjectCmd = &cobra.Command{
 	Use:   "deleteProject",
-	Short: "A brief description of your command",
+	Short: "Removes a user from the org",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 

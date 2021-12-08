@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
 	"snykctl/internal/config"
 	"snykctl/internal/domain"
 	"snykctl/internal/tools"
@@ -23,26 +24,36 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// compareUsersCmd represents the compareUsers command
-var compareUsersCmd = &cobra.Command{
-	Use:   "compareUsers",
-	Short: "Compare users from two orgs",
-	Long: `Compares the users from two orgs For example:
-snykctl compareUsers org1 org2
+// addUserCmd represents the addUser command
+var addUserCmd = &cobra.Command{
+	Use:   "addUser",
+	Short: "Adds an existing user to an Org",
+	Long: `Adds an existing user to an Org. For example:
+snykclt addUser group_id org_id user_id
 `,
 	Args: cobra.MinimumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, debug)
 
-		err := domain.CompareUsers(client, args[0], args[1])
+		err := domain.AddUser(client, args[0], args[1], args[2], "collaborator")
 		if err != nil {
 			return err
 		}
-
+		fmt.Println("OK")
 		return nil
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(compareUsersCmd)
+	rootCmd.AddCommand(addUserCmd)
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// addUserCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// addUserCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
