@@ -27,8 +27,8 @@ import (
 // getOrgsCmd represents the getOrgs command
 var getOrgsCmd = &cobra.Command{
 	Use:   "getOrgs",
-	Short: "Gets the list of Snyk Organisations for the given token",
-	Long: `Gets the list of Snyk Organisations for the given token
+	Short: "gets the list of Snyk Organisations for the given token",
+	Long: `gets the list of Snyk Organisations for the given token
 Example
 snykctl getOrgs
 snykctl getOrgs --quiet

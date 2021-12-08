@@ -27,13 +27,10 @@ import (
 // copyUsersCmd represents the copyUsers command
 var copyUsersCmd = &cobra.Command{
 	Use:   "copyUsers",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "copy users from one Org to another Org",
+	Long: `Copy users from one Org to another Org. For example:
+snykctl copyUsers org1 org2
+`,
 	Args: cobra.MinimumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, debug)

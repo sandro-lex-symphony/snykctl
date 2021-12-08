@@ -27,13 +27,10 @@ import (
 // addTagCmd represents the addTag command
 var addTagCmd = &cobra.Command{
 	Use:   "addTag",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "adds arbitrary key=value tag to a project",
+	Long: `add arbitrary key=value tag to a project. For example:
+snykctl org_id prj_ig key=value
+`,
 	Args: cobra.MinimumNArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, false)

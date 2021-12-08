@@ -27,8 +27,8 @@ import (
 // addAttributesCmd represents the addAttributes command
 var addAttributesCmd = &cobra.Command{
 	Use:   "addAttributes",
-	Short: "Add attributes to projects",
-	Long: `Attributes are static and non-configurable fields which allow to add additional metadata to a project. 
+	Short: "add attributes to projects",
+	Long: `attributes are static and non-configurable fields which allow to add additional metadata to a project. 
 	Attributes have a pre-defined list of values that a user can select from.
 	--env [frontend | backend | internal ...]
 	--lifecycle [production | development | sandbox ]
@@ -40,7 +40,7 @@ var addAttributesCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, false)
 		prjs := domain.NewProjects(client, args[0])
-		err := prjs.AddAttributes(args[1], attrEnvironment, attrLifecycle, attrCriticality	)
+		err := prjs.AddAttributes(args[1], attrEnvironment, attrLifecycle, attrCriticality)
 		if err != nil {
 			return err
 		}

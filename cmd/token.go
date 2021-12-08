@@ -25,8 +25,8 @@ import (
 // tokenCmd represents the token command
 var tokenCmd = &cobra.Command{
 	Use:   "token",
-	Short: "Returns the api token from configuration",
-	Long: `Returns the api token from configuration
+	Short: "print the api token from configuration",
+	Long: `print the api token from configuration
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(config.Instance.Token())

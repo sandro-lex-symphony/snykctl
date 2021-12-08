@@ -27,8 +27,8 @@ import (
 // addUserCmd represents the addUser command
 var addUserCmd = &cobra.Command{
 	Use:   "addUser",
-	Short: "Adds an existing user to an Org",
-	Long: `Adds an existing user to an Org. For example:
+	Short: "adds an existing user to an Org",
+	Long: `adds an existing user to an Org. For example:
 snykclt addUser group_id org_id user_id
 `,
 	Args: cobra.MinimumNArgs(2),

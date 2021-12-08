@@ -29,11 +29,11 @@ var mTags map[string]string
 // getProjectsCmd represents the getProjects command
 var getProjectsCmd = &cobra.Command{
 	Use:   "getProjects",
-	Short: "Get the list of projects in the Org",
-	Long: `Prints the list of projetcs in the org
+	Short: "get the list of projects for an Org",
+	Long: `get the list of projects for an Org. For example:
+snykctl org_id 
 
-Example:
-  snykctl getProjects org_id [flags]
+getProject commands accepts filters such as --tag --env --lifecycle and --criticality
 `,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {

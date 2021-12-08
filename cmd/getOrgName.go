@@ -27,9 +27,9 @@ import (
 // getOrgNameCmd represents the getOrgName command
 var getOrgNameCmd = &cobra.Command{
 	Use:   "getOrgName",
-	Short: "Returns the name of the gievn org",
-	Long: `Returns the name of the given org.  For example:
-snykctl getOrgName [org-id]`,
+	Short: "print the name of the Org",
+	Long: `print the name of the Org.  For example:
+snykctl getOrgName org-id`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, debug)

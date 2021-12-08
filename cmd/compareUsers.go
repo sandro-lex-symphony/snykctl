@@ -26,8 +26,8 @@ import (
 // compareUsersCmd represents the compareUsers command
 var compareUsersCmd = &cobra.Command{
 	Use:   "compareUsers",
-	Short: "Compare users from two orgs",
-	Long: `Compares the users from two orgs For example:
+	Short: "compare users from two orgs",
+	Long: `compares the users from two orgs For example:
 snykctl compareUsers org1 org2
 `,
 	Args: cobra.MinimumNArgs(2),

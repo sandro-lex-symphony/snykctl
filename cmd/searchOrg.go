@@ -27,8 +27,8 @@ import (
 // searchOrgCmd represents the searchOrg command
 var searchOrgCmd = &cobra.Command{
 	Use:   "searchOrg",
-	Short: "Search org using name",
-	Long: `Search org using name For example:
+	Short: "search Org using name",
+	Long: `search Org using name For example:
 snykctl searchOrg [search-term]
 `,
 	Args: cobra.MinimumNArgs(1),
