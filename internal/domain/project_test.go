@@ -78,11 +78,10 @@ func Test_Project_Get_Ids(t *testing.T) {
 	assert.Equal(t, "16df2e12-d4cb-4111-aaf2-547db9ff07e9", prjs.Org.Id)
 
 	expected := "5c8e7160-5b60-4f49-824f-c01c111ea29f\n9931b808-9f92-4283-a8aa-d96289e11111\n"
-	actual, err := prjs.Quiet()
+	actual := prjs.Quiet()
 
 	assert.Nil(t, err)
 	assert.Equal(t, expected, actual)
-
 }
 
 func Test_Project_Get_Names(t *testing.T) {
@@ -102,11 +101,10 @@ func Test_Project_Get_Names(t *testing.T) {
 	assert.Equal(t, "16df2e12-d4cb-4111-aaf2-547db9ff07e9", prjs.Org.Id)
 
 	expected := "prj1:front\ncom.example:cmd-mock-conxxx\n"
-	actual, err := prjs.Names()
+	actual := prjs.Names()
 
 	assert.Nil(t, err)
 	assert.Equal(t, expected, actual)
-
 }
 
 func Test_Project_Get_String(t *testing.T) {
@@ -126,11 +124,25 @@ func Test_Project_Get_String(t *testing.T) {
 	assert.Equal(t, "16df2e12-d4cb-4111-aaf2-547db9ff07e9", prjs.Org.Id)
 
 	expected := "5c8e7160-5b60-4f49-824f-c01c111ea29f   prj1:front\n9931b808-9f92-4283-a8aa-d96289e11111   com.example:cmd-mock-conxxx\n"
-	actual, err := prjs.String()
+	actual := prjs.String()
 
 	assert.Nil(t, err)
 	assert.Equal(t, expected, actual)
+}
 
+func Test_Project_Get_Verbose(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = `{"org":{"name":"org-test","id":"16df2e12-d4cb-4111-aaf2-547db9ff07e9"},"projects":[{"id":"5c8e7160-5b60-4f49-824f-c01c111ea29f","name":"prj1:front","created":"2021-11-22T10:03:05.435Z","origin":"cli","type":"maven","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":0,"issueCountsBySeverity":{"low":0,"high":0,"medium":0,"critical":0},"remoteRepoUrl":"http://example.com/repot/prj1.git","imageTag":"1.0.0-SNAPSHOT","lastTestedDate":"2021-12-05T06:20:50.043Z","browseUrl":"https://app.snyk.io/org/org-test-pie/project/5c8e7160-5b60-4f49-824f-c01c111ea29f","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41f1111","name":"org-test","username":"org-test","email":null},"tags":[{"key": "k1", "value": "v1"}, {"key":"k2", "value":"v2"}],"attributes":{"criticality":["high"],"lifecycle":["production"],"environment":["frontend"]},"branch":null}]}"`
+	client.StatusCode = http.StatusOK
+	client.Status = "XXX"
+	prjs := NewProjects(client, "org_id")
+
+	err := prjs.Get()
+	assert.Nil(t, nil, err)
+	expected := "5c8e7160-5b60-4f49-824f-c01c111ea29f   prj1:front                                        high,frontend,production,[k1=v1,k2=v2]\n"
+	actual := prjs.Verbose()
+	assert.Nil(t, nil, err)
+	assert.Equal(t, expected, actual)
 }
 
 func Test_Project_Get_Raw(t *testing.T) {
