@@ -143,23 +143,23 @@ func (p *Projects) baseGetFiltered(raw bool, env string, lifecycle string, criti
 	return nil
 }
 
-func (p *Projects) String() (string, error) {
+func (p *Projects) String() string {
 	return p.toString("")
 }
 
-func (p *Projects) Quiet() (string, error) {
+func (p *Projects) Quiet() string {
 	return p.toString("id")
 }
 
-func (p *Projects) Names() (string, error) {
+func (p *Projects) Names() string {
 	return p.toString("name")
 }
 
-func (p *Projects) Verbose() (string, error) {
+func (p *Projects) Verbose() string {
 	return p.toString("verbose")
 }
 
-func (p *Projects) toString(filter string) (string, error) {
+func (p *Projects) toString(filter string) string {
 	var ret string
 	for _, prj := range p.Projects {
 		if filter == "id" {
@@ -193,19 +193,19 @@ func (p *Projects) toString(filter string) (string, error) {
 			ret += fmt.Sprintf("%-38s %s\n", prj.Id, prj.Name)
 		}
 	}
-	return ret, nil
+	return ret
 }
 
 func (p Projects) Print(quiet, names, verbose bool) {
 	var out string
 	if quiet {
-		out, _ = p.Quiet()
+		out = p.Quiet()
 	} else if names {
-		out, _ = p.Names()
+		out = p.Names()
 	} else if verbose {
-		out, _ = p.Verbose()
+		out = p.Verbose()
 	} else {
-		out, _ = p.String()
+		out = p.String()
 	}
 
 	fmt.Print(out)

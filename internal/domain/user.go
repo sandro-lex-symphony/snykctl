@@ -133,7 +133,7 @@ func AddUser(client tools.HttpClient, org_id, user_id, role string) error {
 	resp := client.RequestPost(path, jsonValue)
 	if resp.StatusCode != http.StatusOK {
 		resp.Body.Close()
-		return fmt.Errorf("add User failed: %s ", resp.Status)
+		return fmt.Errorf("add User failed: %s", resp.Status)
 	}
 	return nil
 }

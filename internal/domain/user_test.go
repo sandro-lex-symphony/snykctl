@@ -199,5 +199,46 @@ func Test_compare(t *testing.T) {
 	out := compare("o1", "o2", users1, users2)
 
 	assert.Equal(t, expected, out)
+}
 
+func Test_AddUser_OK(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ""
+	client.StatusCode = http.StatusOK
+	client.Status = "XXX"
+
+	err := AddUser(client, "org", "user_id", "role")
+	assert.Nil(t, err)
+}
+
+func Test_AddUser_KO(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ""
+	client.StatusCode = http.StatusUnauthorized
+	client.Status = "XXX"
+
+	err := AddUser(client, "org", "user_id", "role")
+	expectedErrorMsg := "add User failed: XXX"
+	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
+}
+
+func Test_DeleteUser_OK(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ""
+	client.StatusCode = http.StatusOK
+	client.Status = "XXX"
+
+	err := DeleteUser(client, "org", "user_id")
+	assert.Nil(t, err)
+}
+
+func Test_DeleteUser_KO(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ""
+	client.StatusCode = http.StatusUnauthorized
+	client.Status = "XXX"
+
+	err := DeleteUser(client, "org", "user_id")
+	expectedErrorMsg := "deleteUsers failed: XXX"
+	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
 }
