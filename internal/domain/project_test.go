@@ -285,3 +285,16 @@ func Test_GetRawFiltered_OK(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, raw, out)
 }
+
+func Test_GetRawFiltered_KO(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ""
+	client.StatusCode = http.StatusUnauthorized
+	client.Status = "XXX"
+	prjs := NewProjects(client, "org_id")
+	var mTags map[string]string
+	out, err := prjs.GetRawFiltered("", "", "medium", mTags)
+	expectedErrorMsg := "Get filtered projects list failed: XXX "
+	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
+	assert.Equal(t, "", out)
+}

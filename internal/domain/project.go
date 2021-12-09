@@ -110,7 +110,7 @@ func (p *Projects) GetFiltered(env string, lifecycle string, criticality string,
 func (p *Projects) GetRawFiltered(env string, lifecycle string, criticality string, mTags map[string]string) (string, error) {
 	err := p.baseGetFiltered(true, env, lifecycle, criticality, mTags)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 	return p.rawResponse, nil
 }
