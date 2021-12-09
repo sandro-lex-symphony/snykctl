@@ -24,29 +24,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// deleteProjectCmd represents the deleteProject command
-var deleteProjectCmd = &cobra.Command{
-	Use:   "deleteProject",
-	Short: "remove a project from Org",
-	Long: `Removes a project from Org. For example
-snykctl deleteProject org_id prj_id
+// createOrgCmd represents the createOrg command
+var createOrgCmd = &cobra.Command{
+	Use:   "createOrg",
+	Short: "create a new Org",
+	Long: `create a new Org. For example:
+snykctl createOrg org-name
 
-(*) Requires group admin / Org admin permission 
+(*) Requires group admin permission
 `,
-	Args: cobra.MinimumNArgs(2),
+	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, false)
-		prjs := domain.NewProjects(client, args[0])
-
-		if err := prjs.DeleteProject(args[1]); err != nil {
+		if err := domain.CreateOrg(client, args[0]); err != nil {
 			return err
 		}
-
 		fmt.Println("OK")
 		return nil
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(deleteProjectCmd)
+	rootCmd.AddCommand(createOrgCmd)
 }

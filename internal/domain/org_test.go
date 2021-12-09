@@ -177,3 +177,45 @@ func Test_Org_GetOrgName_Notfound(t *testing.T) {
 	expectedErrorMsg := "getOrgName: org not found 123"
 	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
 }
+
+func Test_CreateOrg_KO(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ""
+	client.StatusCode = http.StatusNotFound
+	client.Status = "XXX"
+
+	err := CreateOrg(client, "org")
+	expectedErrorMsg := "addOrg failed: XXX"
+	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
+}
+
+func Test_CreateOrg_OK(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ""
+	client.StatusCode = http.StatusCreated
+	client.Status = "XXX"
+
+	err := CreateOrg(client, "org")
+	assert.Nil(t, err)
+}
+
+func Test_DeleteOrg_KO(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ""
+	client.StatusCode = http.StatusNotFound
+	client.Status = "XXX"
+
+	err := DeleteOrg(client, "org")
+	expectedErrorMsg := "deleteOrg failed: XXX"
+	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
+}
+
+func Test_DeleteOrg_OK(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ""
+	client.StatusCode = http.StatusNoContent
+	client.Status = "XXX"
+
+	err := DeleteOrg(client, "org")
+	assert.Nil(t, err)
+}

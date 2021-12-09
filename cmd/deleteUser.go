@@ -30,6 +30,8 @@ var deleteUserCmd = &cobra.Command{
 	Short: "removes user from Org",
 	Long: `Removes user from Org. For example:
 snykctl deleteUser org_id user_id
+
+(*) Requires group admin permission
 `,
 	Args: cobra.MinimumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {

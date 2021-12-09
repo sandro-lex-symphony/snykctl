@@ -5,8 +5,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"snykctl/internal/config"
 	"snykctl/internal/tools"
 )
+
+const orgsPath = "/orgs"
+const orgPath = "/org"
+const deleteOrgPath = "/org/%s"
 
 type Org struct {
 	Id   string
@@ -93,7 +98,7 @@ func (o *Orgs) GetRaw() (string, error) {
 }
 
 func (o *Orgs) baseGet(raw bool) error {
-	resp := o.client.RequestGet("/orgs")
+	resp := o.client.RequestGet(orgsPath)
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
@@ -118,4 +123,27 @@ func (o *Orgs) baseGet(raw bool) error {
 
 func (o Orgs) Sync() bool {
 	return o.sync
+}
+
+func CreateOrg(client tools.HttpClient, org_name string) error {
+	jsonValue, _ := json.Marshal(map[string]string{
+		"name":    org_name,
+		"groupId": config.Instance.Id(),
+	})
+	resp := client.RequestPost(orgPath, jsonValue)
+	if resp.StatusCode != http.StatusCreated {
+		resp.Body.Close()
+		return fmt.Errorf("addOrg failed: %s", resp.Status)
+	}
+	return nil
+}
+
+func DeleteOrg(client tools.HttpClient, org_id string) error {
+	path := fmt.Sprintf(deleteOrgPath, org_id)
+	resp := client.RequestDelete(path)
+	if resp.StatusCode != http.StatusNoContent {
+		resp.Body.Close()
+		return fmt.Errorf("deleteOrg failed: %s", resp.Status)
+	}
+	return nil
 }

@@ -30,6 +30,8 @@ var copyUsersCmd = &cobra.Command{
 	Short: "copy users from one Org to another Org",
 	Long: `Copy users from one Org to another Org. For example:
 snykctl copyUsers org1 org2
+
+(*) Requires group admin permission
 `,
 	Args: cobra.MinimumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {

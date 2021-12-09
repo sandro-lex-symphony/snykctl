@@ -30,6 +30,8 @@ var addUserCmd = &cobra.Command{
 	Short: "adds an existing user to an Org",
 	Long: `adds an existing user to an Org. For example:
 snykclt addUser group_id org_id user_id
+
+(*) Requires group admin permission
 `,
 	Args: cobra.MinimumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {

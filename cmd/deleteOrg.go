@@ -24,29 +24,36 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// deleteProjectCmd represents the deleteProject command
-var deleteProjectCmd = &cobra.Command{
-	Use:   "deleteProject",
-	Short: "remove a project from Org",
-	Long: `Removes a project from Org. For example
-snykctl deleteProject org_id prj_id
+// deleteOrgCmd represents the deleteOrg command
+var deleteOrgCmd = &cobra.Command{
+	Use:   "deleteOrg",
+	Short: "delete an Org",
+	Long: `delete an Org. For example:
+snykctl deleteOrg org_id
 
-(*) Requires group admin / Org admin permission 
+(*) Requires group admin permission
 `,
-	Args: cobra.MinimumNArgs(2),
+	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, false)
-		prjs := domain.NewProjects(client, args[0])
-
-		if err := prjs.DeleteProject(args[1]); err != nil {
+		if err := domain.DeleteOrg(client, args[0]); err != nil {
 			return err
 		}
-
 		fmt.Println("OK")
 		return nil
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(deleteProjectCmd)
+	rootCmd.AddCommand(deleteOrgCmd)
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// deleteOrgCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// deleteOrgCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

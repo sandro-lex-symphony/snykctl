@@ -30,6 +30,8 @@ var getGroupUsersCmd = &cobra.Command{
 	Short: "get users from group",
 	Long: `get users from group. For example:
 snykctl getGroupUsers 
+
+(*) Requires group admin permission
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var group_id string
