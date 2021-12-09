@@ -18,7 +18,6 @@ func Test_Project_Get_httpError(t *testing.T) {
 	err := prjs.Get()
 	expectedErrorMsg := "GetProjects failed: XXX"
 	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
-	assert.Equal(t, false, prjs.IsSync())
 }
 
 func Test_Project_Get_badBody(t *testing.T) {
@@ -31,7 +30,6 @@ func Test_Project_Get_badBody(t *testing.T) {
 	err := prjs.Get()
 	expectedErrorMsg := "GetProjects failed:"
 	assert.Containsf(t, err.Error(), expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
-	assert.Equal(t, false, prjs.IsSync())
 }
 
 func Test_Project_Get_Ok(t *testing.T) {
@@ -44,7 +42,6 @@ func Test_Project_Get_Ok(t *testing.T) {
 	err := prjs.Get()
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, true, prjs.IsSync())
 
 	assert.Equal(t, 2, len(prjs.Projects))
 	// id is read from json output
@@ -71,7 +68,6 @@ func Test_Project_Get_Ids(t *testing.T) {
 	err := prjs.Get()
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, true, prjs.IsSync())
 
 	assert.Equal(t, 2, len(prjs.Projects))
 	// id is read from json output
@@ -94,7 +90,6 @@ func Test_Project_Get_Names(t *testing.T) {
 	err := prjs.Get()
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, true, prjs.IsSync())
 
 	assert.Equal(t, 2, len(prjs.Projects))
 	// id is read from json output
@@ -117,7 +112,6 @@ func Test_Project_Get_String(t *testing.T) {
 	err := prjs.Get()
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, true, prjs.IsSync())
 
 	assert.Equal(t, 2, len(prjs.Projects))
 	// id is read from json output
@@ -156,8 +150,6 @@ func Test_Project_Get_Raw(t *testing.T) {
 	actual, err := prjs.GetRaw()
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, true, prjs.IsSync())
-
 	assert.Equal(t, raw, actual)
 }
 

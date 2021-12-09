@@ -18,7 +18,6 @@ func Test_Org_Get_httpError(t *testing.T) {
 	err := orgs.Get()
 	expectedErrorMsg := "GetOrgs failed: XXX"
 	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
-	assert.Equal(t, false, orgs.Sync())
 }
 
 func Test_Org_Get_badBody(t *testing.T) {
@@ -31,7 +30,6 @@ func Test_Org_Get_badBody(t *testing.T) {
 	err := orgs.Get()
 	expectedErrorMsg := "GetOrgs failed:"
 	assert.Containsf(t, err.Error(), expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
-	assert.Equal(t, false, orgs.Sync())
 }
 
 func Test_Org_Get_Ok(t *testing.T) {
@@ -44,7 +42,6 @@ func Test_Org_Get_Ok(t *testing.T) {
 	err := orgs.Get()
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, true, orgs.Sync())
 
 	assert.Equal(t, 3, len(orgs.Orgs))
 
@@ -68,7 +65,6 @@ func Test_Org_Get_Quiet(t *testing.T) {
 	err := orgs.Get()
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, true, orgs.Sync())
 
 	assert.Equal(t, 3, len(orgs.Orgs))
 
@@ -88,7 +84,6 @@ func Test_Org_Get_String(t *testing.T) {
 	err := orgs.Get()
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, true, orgs.Sync())
 
 	assert.Equal(t, 3, len(orgs.Orgs))
 
@@ -108,7 +103,6 @@ func Test_Org_Get_Names(t *testing.T) {
 	err := orgs.Get()
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, true, orgs.Sync())
 
 	assert.Equal(t, 3, len(orgs.Orgs))
 
@@ -129,7 +123,6 @@ func Test_Org_Get_Raw(t *testing.T) {
 	out, err := orgs.GetRaw()
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, true, orgs.Sync())
 
 	assert.Equal(t, raw, out)
 }
@@ -146,8 +139,6 @@ func Test_Org_Get_Raw_Err(t *testing.T) {
 	assert.Equal(t, "", out)
 	expectedErrorMsg := "GetOrgs failed: XXX"
 	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
-
-	assert.Equal(t, false, orgs.Sync())
 }
 
 func Test_Org_GetOrgName_OK(t *testing.T) {
@@ -160,7 +151,6 @@ func Test_Org_GetOrgName_OK(t *testing.T) {
 	out, err := orgs.GetOrgName("f6910fd7-43a3-4e20-8327-6b621b7746b3")
 
 	assert.Equal(t, nil, err)
-	assert.Equal(t, true, orgs.Sync())
 	assert.Equal(t, "JDC On Prem", out)
 }
 

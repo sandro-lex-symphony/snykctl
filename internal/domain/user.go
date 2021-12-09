@@ -21,7 +21,6 @@ type Users struct {
 	Users       []*User
 	Org         Org
 	client      tools.HttpClient
-	sync        bool
 	rawResponse string
 }
 
@@ -88,7 +87,6 @@ func (u *Users) baseGet(raw bool, endpoint string) error {
 		u.Users = result
 	}
 
-	u.sync = true
 	return nil
 }
 
@@ -116,10 +114,6 @@ func (u Users) toString(filter string) string {
 		}
 	}
 	return out
-}
-
-func (u Users) Sync() bool {
-	return u.sync
 }
 
 func AddUser(client tools.HttpClient, org_id, user_id, role string) error {

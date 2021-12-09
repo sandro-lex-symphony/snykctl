@@ -14,6 +14,7 @@ const projectPath = "/org/%s/project/%s"
 const tagPath = "/org/%s/project/%s/tags"
 const attributesPath = "/org/%s/project/%s/attributes"
 const ignorePath = "/org/%s/project/%s/ignores"
+const issuesPath = "org/orgId/project/projectId/aggregated-issues"
 
 var validEnvironments = [9]string{"frontend", "backend", "internal", "external", "mobile", "saas", "on-prem", "hosted", "distributed"}
 var validLifecycle = [3]string{"production", "development", "sandbox"}
@@ -22,7 +23,6 @@ var validCriticality = [4]string{"critical", "high", "medium", "low"}
 type Projects struct {
 	Org         Org
 	Projects    []*Project
-	sync        bool
 	client      tools.HttpClient
 	rawResponse string
 }
@@ -115,7 +115,6 @@ func (p *Projects) baseGet(raw bool, path string) error {
 		}
 	}
 
-	p.sync = true
 	return nil
 }
 
@@ -152,8 +151,6 @@ func (p *Projects) baseGetFiltered(raw bool, env string, lifecycle string, criti
 			return fmt.Errorf("Get filtered projects list failed: %s ", err)
 		}
 	}
-
-	p.sync = true
 
 	return nil
 }
@@ -224,10 +221,6 @@ func (p Projects) Print(quiet, names, verbose bool) {
 	}
 
 	fmt.Print(out)
-}
-
-func (p Projects) IsSync() bool {
-	return p.sync
 }
 
 func (p *Projects) AddAttributes(prj_id string, env string, lifecycle string, criticality string) error {

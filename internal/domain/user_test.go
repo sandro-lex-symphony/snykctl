@@ -19,7 +19,6 @@ func Test_User_Get_httpError(t *testing.T) {
 	err := u.Get()
 	expectedErrorMsg := "GetUsers failed: XXX"
 	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
-	assert.Equal(t, false, u.Sync())
 }
 
 func Test_Users_Get_badBody(t *testing.T) {
@@ -32,7 +31,6 @@ func Test_Users_Get_badBody(t *testing.T) {
 	err := u.Get()
 	expectedErrorMsg := "GetUsers failed:"
 	assert.Containsf(t, err.Error(), expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
-	assert.Equal(t, false, u.Sync())
 }
 
 func Test_User_Get_Ok(t *testing.T) {

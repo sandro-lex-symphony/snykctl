@@ -21,7 +21,6 @@ type Org struct {
 
 type Orgs struct {
 	Orgs        []*Org
-	sync        bool
 	client      tools.HttpClient
 	rawResponse string
 }
@@ -33,11 +32,10 @@ func NewOrgs(c tools.HttpClient) *Orgs {
 }
 
 func (o *Orgs) GetOrgName(id string) (string, error) {
-	if !o.Sync() {
-		if err := o.Get(); err != nil {
-			return "", err
-		}
+	if err := o.Get(); err != nil {
+		return "", err
 	}
+
 	for _, org := range o.Orgs {
 		if org.Id == id {
 			return org.Name, nil
@@ -117,13 +115,8 @@ func (o *Orgs) baseGet(raw bool) error {
 			return fmt.Errorf("GetOrgs failed: %s", err)
 		}
 	}
-	o.sync = true
 
 	return nil
-}
-
-func (o Orgs) Sync() bool {
-	return o.sync
 }
 
 func CreateOrg(client tools.HttpClient, org_name string) error {
