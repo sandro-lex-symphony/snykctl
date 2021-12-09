@@ -12,6 +12,7 @@ import (
 const orgsPath = "/orgs"
 const orgPath = "/org"
 const deleteOrgPath = "/org/%s"
+const orgSettingsPath = "/org/%s/settings"
 
 type Org struct {
 	Id   string

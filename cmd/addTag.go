@@ -33,7 +33,7 @@ snykctl org_id prj_ig key=value
 `,
 	Args: cobra.MinimumNArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := tools.NewHttpclient(config.Instance, false)
+		client := tools.NewHttpclient(config.Instance, debug)
 		prjs := domain.NewProjects(client, args[0])
 		if err := prjs.AddTag(args[1], args[2]); err != nil {
 			return err

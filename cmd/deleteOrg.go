@@ -35,7 +35,7 @@ snykctl deleteOrg org_id
 `,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := tools.NewHttpclient(config.Instance, false)
+		client := tools.NewHttpclient(config.Instance, debug)
 		if err := domain.DeleteOrg(client, args[0]); err != nil {
 			return err
 		}

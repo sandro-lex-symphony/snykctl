@@ -35,7 +35,7 @@ snykctl deleteProject org_id prj_id
 `,
 	Args: cobra.MinimumNArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client := tools.NewHttpclient(config.Instance, false)
+		client := tools.NewHttpclient(config.Instance, debug)
 		prjs := domain.NewProjects(client, args[0])
 
 		if err := prjs.DeleteProject(args[1]); err != nil {
