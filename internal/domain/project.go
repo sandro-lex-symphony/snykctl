@@ -70,11 +70,6 @@ func (p *Projects) Get() error {
 	return p.baseGet(false, path)
 }
 
-// func (p *Projects) GetProject(prj_id string) error {
-// 	path := fmt.Sprintf(projectPath, p.Org.Id, prj_id)
-// 	return p.baseGet(false, path)
-// }
-
 func (p *Projects) GetRawProject(prj_id string) (string, error) {
 	path := fmt.Sprintf(projectPath, p.Org.Id, prj_id)
 	err := p.baseGet(true, path)
@@ -110,53 +105,9 @@ func (p *Projects) baseGet(raw bool, path string) error {
 
 func (p *Projects) GetFiltered(env string, lifecycle string, criticality string, mTags map[string]string) error {
 	path := fmt.Sprintf(projectsPath, p.Org.Id)
+	filterBody := BuildFilterBody(env, lifecycle, criticality, mTags)
 
-	var attributesContent, attributes, filterContent, tags string
-
-	if lifecycle != "" || env != "" || criticality != "" {
-		var attrs []string
-
-		if lifecycle != "" {
-			at := fmt.Sprintf(`"lifecycle": [ "%s" ]`, lifecycle)
-			attrs = append(attrs, at)
-		}
-		if env != "" {
-			at := fmt.Sprintf(`"environment": [ "%s" ]`, env)
-			attrs = append(attrs, at)
-		}
-
-		if criticality != "" {
-			at := fmt.Sprintf(`"criticality": [ "%s" ]`, criticality)
-			attrs = append(attrs, at)
-		}
-
-		attributes = strings.Join(attrs, ",")
-		attributesContent = fmt.Sprintf(`"attributes": { %s }`, attributes)
-	}
-
-	if len(mTags) > 0 {
-		tags += ` "tags": { "includes": [`
-		var ii []string
-		for key, value := range mTags {
-			i := fmt.Sprintf(`{ "key": "%s", "value": "%s" } `, key, value)
-			ii = append(ii, i)
-		}
-		tag := strings.Join(ii, ", ")
-		tags += tag
-		tags += "] }"
-	}
-
-	if attributesContent != "" && tags != "" {
-		filterContent = attributesContent + ", " + tags
-	} else if attributesContent != "" {
-		filterContent = attributesContent
-	} else {
-		filterContent = tags
-	}
-
-	filters := fmt.Sprintf(`{ "filters": { %s } }`, filterContent)
-
-	var jsonStr = []byte(filters)
+	var jsonStr = []byte(filterBody)
 	resp := p.client.RequestPost(path, jsonStr)
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
@@ -244,27 +195,6 @@ func (p Projects) IsSync() bool {
 	return p.sync
 }
 
-func BuildAttributesBody(env, lifecycle, criticality string) string {
-	if env == "" && lifecycle == "" && criticality == "" {
-		return ""
-	}
-	var values []string
-	if env != "" {
-		value := fmt.Sprintf(`"environment": ["%s"]`, env)
-		values = append(values, value)
-	}
-	if lifecycle != "" {
-		value := fmt.Sprintf(`"lifecycle": ["%s"]`, lifecycle)
-		values = append(values, value)
-	}
-	if criticality != "" {
-		value := fmt.Sprintf(`"criticality": ["%s"]`, criticality)
-		values = append(values, value)
-	}
-	c := strings.Join(values, ",")
-	return fmt.Sprintf("{ %s }", c)
-}
-
 func (p *Projects) AddAttributes(prj_id string, env string, lifecycle string, criticality string) error {
 	err := ParseAttributes(env, lifecycle, criticality)
 	if err != nil {
@@ -303,43 +233,6 @@ func (p *Projects) AddTag(prj_id string, tag string) error {
 		return fmt.Errorf("failed to add tag %s", resp.Status)
 	}
 	return nil
-}
-
-func ParseAttributes(filterEnv, filterLifecycle, filterCriticality string) error {
-	if filterEnv != "" {
-		if !tools.Contains(validEnvironments[:], filterEnv) {
-			return fmt.Errorf("invalid environment value: %s\nValid values: %v", filterEnv, validEnvironments[:])
-		}
-	}
-
-	if filterLifecycle != "" {
-		if !tools.Contains(validLifecycle[:], filterLifecycle) {
-			return fmt.Errorf("invalid lifecycle value: %s\nValid values: %v", filterLifecycle, validLifecycle[:])
-		}
-	}
-
-	if filterCriticality != "" {
-		if !tools.Contains(validCriticality[:], filterCriticality) {
-			return fmt.Errorf("invalid lifecycle value: %s\nValid values: %v", filterCriticality, validCriticality[:])
-		}
-	}
-	return nil
-}
-
-func ParseTags(filterTag []string) (map[string]string, error) {
-	var mTags map[string]string
-	if len(filterTag) > 0 {
-		mTags = make(map[string]string)
-		for _, tag := range filterTag {
-			k, v, err := ParseTag(tag)
-			if err != nil {
-				return mTags, err
-			}
-			mTags[k] = v
-		}
-	}
-
-	return mTags, nil
 }
 
 func (p *Projects) DeleteProject(prj_id string) error {
