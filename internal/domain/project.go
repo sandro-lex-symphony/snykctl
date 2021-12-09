@@ -13,8 +13,7 @@ const projectsPath = "/org/%s/projects"
 const projectPath = "/org/%s/project/%s"
 const tagPath = "/org/%s/project/%s/tags"
 const attributesPath = "/org/%s/project/%s/attributes"
-const ignorePath = "/org/%s/project/%s/ignores"
-const issuesPath = "org/orgId/project/projectId/aggregated-issues"
+const issuesPath = "/org/%s/project/%s/aggregated-issues"
 
 var validEnvironments = [9]string{"frontend", "backend", "internal", "external", "mobile", "saas", "on-prem", "hosted", "distributed"}
 var validLifecycle = [3]string{"production", "development", "sandbox"}
@@ -43,23 +42,6 @@ type Attributes struct {
 type Tag struct {
 	Key   string
 	Value string
-}
-
-type IgnoreStar struct {
-	Star Ignore `json:"*"`
-}
-
-type Ignore struct {
-	Reason     string
-	Created    string
-	Expires    string
-	reasonType string
-	IgnoredBy  User
-}
-
-type IgnoreResult struct {
-	Id      string
-	Content Ignore
 }
 
 func NewProjects(c tools.HttpClient, org_id string) *Projects {
@@ -283,49 +265,4 @@ func (p *Projects) DeleteAllProjects() (string, error) {
 	}
 
 	return out, nil
-}
-
-func GetProjectIgnores(client tools.HttpClient, org_id, prj_id string) ([]IgnoreResult, error) {
-	var result []IgnoreResult
-	path := fmt.Sprintf(ignorePath, org_id, prj_id)
-	resp := client.RequestGet(path)
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return result, fmt.Errorf("GetProjects failed: %s", resp.Status)
-	}
-
-	var ignore_result map[string][]IgnoreStar
-
-	if err := json.NewDecoder(resp.Body).Decode(&ignore_result); err != nil {
-		return result, err
-	}
-
-	for key, value := range ignore_result {
-		for i := 0; i < len(value); i++ {
-			var ii IgnoreResult
-			ii.Id = key
-			ii.Content = value[i].Star
-			result = append(result, ii)
-		}
-	}
-
-	return result, nil
-}
-
-func FormatIgnore(res IgnoreResult, prj string) string {
-	if prj != "" {
-		return fmt.Sprintf("%-38s%-30s%-30s%-30s%s\n", prj, res.Id, res.Content.Created, res.Content.IgnoredBy.Email, res.Content.Reason)
-	} else {
-		return fmt.Sprintf("%-30s%-30s%-30s%s\n", res.Id, res.Content.Created, res.Content.IgnoredBy.Email, res.Content.Reason)
-	}
-}
-
-func FormatIgnoreResult(res []IgnoreResult, prj string) string {
-	var out string
-	for i := 0; i < len(res); i++ {
-		out += FormatIgnore(res[i], prj)
-	}
-
-	return out
 }
