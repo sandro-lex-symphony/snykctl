@@ -57,8 +57,7 @@ func (p *Projects) SetClient(c tools.HttpClient) {
 
 func (p *Projects) GetRaw() (string, error) {
 	path := fmt.Sprintf(projectsPath, p.Org.Id)
-	err := p.baseGet(true, path)
-	if err != nil {
+	if err := p.baseGet(true, path); err != nil {
 		return "", err
 	}
 
@@ -72,8 +71,7 @@ func (p *Projects) Get() error {
 
 func (p *Projects) GetRawProject(prj_id string) (string, error) {
 	path := fmt.Sprintf(projectPath, p.Org.Id, prj_id)
-	err := p.baseGet(true, path)
-	if err != nil {
+	if err := p.baseGet(true, path); err != nil {
 		return "", nil
 	}
 	return p.rawResponse, nil
@@ -108,8 +106,7 @@ func (p *Projects) GetFiltered(env string, lifecycle string, criticality string,
 }
 
 func (p *Projects) GetRawFiltered(env string, lifecycle string, criticality string, mTags map[string]string) (string, error) {
-	err := p.baseGetFiltered(true, env, lifecycle, criticality, mTags)
-	if err != nil {
+	if err := p.baseGetFiltered(true, env, lifecycle, criticality, mTags); err != nil {
 		return "", err
 	}
 	return p.rawResponse, nil
@@ -216,8 +213,7 @@ func (p Projects) IsSync() bool {
 }
 
 func (p *Projects) AddAttributes(prj_id string, env string, lifecycle string, criticality string) error {
-	err := ParseAttributes(env, lifecycle, criticality)
-	if err != nil {
+	if err := ParseAttributes(env, lifecycle, criticality); err != nil {
 		return err
 	}
 

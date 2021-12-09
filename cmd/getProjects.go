@@ -24,8 +24,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var mTags map[string]string
-
 // getProjectsCmd represents the getProjects command
 var getProjectsCmd = &cobra.Command{
 	Use:   "getProjects",
@@ -45,8 +43,7 @@ getProject commands accepts filters such as --tag --env --lifecycle and --critic
 		var err error
 
 		if checkAtLeastOneFilterSet() {
-			err := domain.ParseAttributes(attrEnvironment, attrLifecycle, attrCriticality)
-			if err != nil {
+			if err := domain.ParseAttributes(attrEnvironment, attrLifecycle, attrCriticality); err != nil {
 				return err
 			}
 
@@ -62,8 +59,7 @@ getProject commands accepts filters such as --tag --env --lifecycle and --critic
 				fmt.Println(ret)
 				return nil
 			}
-			err = prjs.GetFiltered(attrEnvironment, attrLifecycle, attrCriticality, mTags)
-			if err != nil {
+			if err = prjs.GetFiltered(attrEnvironment, attrLifecycle, attrCriticality, mTags); err != nil {
 				return err
 			}
 		} else {
@@ -76,8 +72,7 @@ getProject commands accepts filters such as --tag --env --lifecycle and --critic
 				return nil
 			}
 
-			err = prjs.Get()
-			if err != nil {
+			if err = prjs.Get(); err != nil {
 				return err
 			}
 		}
