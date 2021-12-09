@@ -310,3 +310,33 @@ func Test_GetRawFiltered_KO(t *testing.T) {
 	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
 	assert.Equal(t, "", out)
 }
+
+func Test_DeleteAll_KO(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ""
+	client.StatusCode = http.StatusUnauthorized
+	client.Status = "XXX"
+	prjs := NewProjects(client, "org_id")
+	prj := Project{Id: "id", Name: "name"}
+	prjs.Projects = append(prjs.Projects, &prj)
+	out, err := prjs.DeleteAllProjects()
+
+	expectedErrorMsg := "deleteProject failed: XXX"
+	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
+	assert.Equal(t, "", out)
+}
+
+func Test_DeleteAll_OK(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ""
+	client.StatusCode = http.StatusOK
+	client.Status = "XXX"
+	prjs := NewProjects(client, "org_id")
+	prj := Project{Id: "id", Name: "name"}
+	prjs.Projects = append(prjs.Projects, &prj)
+	out, err := prjs.DeleteAllProjects()
+	assert.Nil(t, err)
+	expected := "id                                    DELETED\n"
+
+	assert.Equal(t, expected, out)
+}

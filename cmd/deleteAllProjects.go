@@ -35,6 +35,26 @@ snykctl deleteAllProjects org_id
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, false)
 		prjs := domain.NewProjects(client, args[0])
+
+		if checkAtLeastOneFilterSet() {
+			if err := domain.ParseAttributes(attrEnvironment, attrLifecycle, attrCriticality); err != nil {
+				return err
+			}
+
+			mTags, err := domain.ParseTags(attrTag)
+			if err != nil {
+				return err
+			}
+
+			if err = prjs.GetFiltered(attrEnvironment, attrLifecycle, attrCriticality, mTags); err != nil {
+				return err
+			}
+		} else {
+			if err := prjs.Get(); err != nil {
+				return err
+			}
+		}
+
 		out, err := prjs.DeleteAllProjects()
 		if err != nil {
 			return err
@@ -47,13 +67,9 @@ snykctl deleteAllProjects org_id
 func init() {
 	rootCmd.AddCommand(deleteAllProjectsCmd)
 
-	// Here you will define your flags and configuration settings.
+	deleteAllProjectsCmd.PersistentFlags().StringVarP(&attrEnvironment, "env", "", "", "Filters by environment [frontend | backend | internal | external | mobile | saas | on-prem | hosted | distributed]")
+	deleteAllProjectsCmd.PersistentFlags().StringVarP(&attrLifecycle, "lifecycle", "", "", "Filters by lifecycle [production | development | sandbox]")
+	deleteAllProjectsCmd.PersistentFlags().StringVarP(&attrCriticality, "criticality", "", "", "Filters by criticality [critical | high | medium | low]")
+	deleteAllProjectsCmd.PersistentFlags().StringSliceVarP(&attrTag, "tag", "", []string{}, "Filters by tag (key1=value1;key2=value2)")
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// deleteAllProjectsCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// deleteAllProjectsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

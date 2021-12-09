@@ -263,10 +263,6 @@ func (p *Projects) DeleteProject(prj_id string) error {
 }
 
 func (p *Projects) DeleteAllProjects() (string, error) {
-	if err := p.Get(); err != nil {
-		return "", err
-	}
-
 	var out string
 	for _, prj := range p.Projects {
 		if err := p.DeleteProject(prj.Id); err != nil {
