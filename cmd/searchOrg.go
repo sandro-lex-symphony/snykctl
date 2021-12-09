@@ -36,8 +36,7 @@ snykctl searchOrg [search-term]
 		client := tools.NewHttpclient(config.Instance, debug)
 
 		orgs := domain.NewOrgs(client)
-		err := orgs.Get()
-		if err != nil {
+		if err := orgs.Get(); err != nil {
 			return err
 		}
 

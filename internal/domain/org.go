@@ -28,8 +28,7 @@ func NewOrgs(c tools.HttpClient) *Orgs {
 
 func (o *Orgs) GetOrgName(id string) (string, error) {
 	if !o.Sync() {
-		err := o.Get()
-		if err != nil {
+		if err := o.Get(); err != nil {
 			return "", err
 		}
 	}
@@ -45,19 +44,19 @@ func (o *Orgs) SetClient(c tools.HttpClient) {
 	o.client = c
 }
 
-func (o *Orgs) String() (string, error) {
+func (o *Orgs) String() string {
 	return o.toString("")
 }
 
-func (o *Orgs) Quiet() (string, error) {
+func (o *Orgs) Quiet() string {
 	return o.toString("id")
 }
 
-func (o *Orgs) Names() (string, error) {
+func (o *Orgs) Names() string {
 	return o.toString("name")
 }
 
-func (o *Orgs) toString(filter string) (string, error) {
+func (o *Orgs) toString(filter string) string {
 	var ret string
 	for _, org := range o.Orgs {
 		if filter == "id" {
@@ -69,22 +68,17 @@ func (o *Orgs) toString(filter string) (string, error) {
 		}
 
 	}
-
-	return ret, nil
+	return ret
 }
 
 func (o Orgs) Print(quiet, names bool) {
-	var out string
 	if quiet {
-		out, _ = o.Quiet()
+		fmt.Print(o.Quiet())
 	} else if names {
-		out, _ = o.Names()
+		fmt.Print(o.Names())
 	} else {
-		out, _ = o.String()
+		fmt.Print(o.String())
 	}
-
-	fmt.Print(out)
-
 }
 
 func (o *Orgs) Get() error {
@@ -92,8 +86,7 @@ func (o *Orgs) Get() error {
 }
 
 func (o *Orgs) GetRaw() (string, error) {
-	err := o.baseGet(true)
-	if err != nil {
+	if err := o.baseGet(true); err != nil {
 		return "", err
 	}
 	return o.rawResponse, nil

@@ -73,7 +73,7 @@ func Test_Org_Get_Quiet(t *testing.T) {
 	assert.Equal(t, 3, len(orgs.Orgs))
 
 	expected := "f6910fd7-43a3-4e20-8327-6b621b7746b3\n711c53b6-a85d-4a51-a34f-42552cc8572e\n10fee9f9-c85c-470d-b9b7-4c9e20b09f07\n"
-	actual, err := orgs.Quiet()
+	actual := orgs.Quiet()
 	assert.Equal(t, expected, actual)
 	assert.Equal(t, nil, err)
 }
@@ -93,7 +93,7 @@ func Test_Org_Get_String(t *testing.T) {
 	assert.Equal(t, 3, len(orgs.Orgs))
 
 	expected := "f6910fd7-43a3-4e20-8327-6b621b7746b3   JDC On Prem\n711c53b6-a85d-4a51-a34f-42552cc8572e   Release - Current\n10fee9f9-c85c-470d-b9b7-4c9e20b09f07   Directory\n"
-	actual, err := orgs.String()
+	actual := orgs.String()
 	assert.Equal(t, expected, actual)
 	assert.Equal(t, nil, err)
 }
@@ -113,7 +113,7 @@ func Test_Org_Get_Names(t *testing.T) {
 	assert.Equal(t, 3, len(orgs.Orgs))
 
 	expected := "JDC On Prem\nRelease - Current\nDirectory\n"
-	actual, err := orgs.Names()
+	actual := orgs.Names()
 	assert.Equal(t, expected, actual)
 	assert.Equal(t, nil, err)
 }

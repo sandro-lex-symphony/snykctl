@@ -35,8 +35,7 @@ snykclt addUser group_id org_id user_id
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, debug)
 
-		err := domain.AddUser(client, args[0], args[1], "collaborator")
-		if err != nil {
+		if err := domain.AddUser(client, args[0], args[1], "collaborator"); err != nil {
 			return err
 		}
 		fmt.Println("OK")

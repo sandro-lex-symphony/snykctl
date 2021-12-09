@@ -35,8 +35,7 @@ snykctl org_id prj_ig key=value
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, false)
 		prjs := domain.NewProjects(client, args[0])
-		err := prjs.AddTag(args[1], args[2])
-		if err != nil {
+		if err := prjs.AddTag(args[1], args[2]); err != nil {
 			return err
 		}
 

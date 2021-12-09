@@ -50,8 +50,7 @@ snykctl getOrgs --quiet
 			return nil
 		}
 
-		err = orgs.Get()
-		if err != nil {
+		if err = orgs.Get(); err != nil {
 			return err
 		}
 		orgs.Print(quiet, names)

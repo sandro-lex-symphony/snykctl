@@ -56,8 +56,7 @@ snykctl getGroupUsers
 			return nil
 		}
 
-		err = users.GetGroup()
-		if err != nil {
+		if err = users.GetGroup(); err != nil {
 			return err
 		}
 

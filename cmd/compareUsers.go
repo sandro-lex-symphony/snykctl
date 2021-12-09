@@ -34,8 +34,7 @@ snykctl compareUsers org1 org2
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, debug)
 
-		err := domain.CompareUsers(client, args[0], args[1])
-		if err != nil {
+		if err := domain.CompareUsers(client, args[0], args[1]); err != nil {
 			return err
 		}
 

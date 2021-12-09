@@ -35,8 +35,7 @@ snykctl copyUsers org1 org2
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, debug)
 
-		err := domain.CopyUsers(client, args[0], args[1])
-		if err != nil {
+		if err := domain.CopyUsers(client, args[0], args[1]); err != nil {
 			return err
 		}
 		fmt.Println("OK")

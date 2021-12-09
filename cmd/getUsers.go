@@ -49,8 +49,7 @@ snykctl getUsers org_id
 			return nil
 		}
 
-		err = users.Get()
-		if err != nil {
+		if err = users.Get(); err != nil {
 			return err
 		}
 

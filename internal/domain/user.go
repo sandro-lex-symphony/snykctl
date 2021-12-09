@@ -48,8 +48,7 @@ func (u *Users) GetGroup() error {
 }
 
 func (u *Users) GetGroupRaw() (string, error) {
-	err := u.baseGet(true, groupMembersPath)
-	if err != nil {
+	if err := u.baseGet(true, groupMembersPath); err != nil {
 		return "", err
 	}
 	return u.rawResponse, nil
@@ -60,8 +59,7 @@ func (u *Users) Get() error {
 }
 
 func (u *Users) GetRaw() (string, error) {
-	err := u.baseGet(true, membersPath)
-	if err != nil {
+	if err := u.baseGet(true, membersPath); err != nil {
 		return "", err
 	}
 	return u.rawResponse, nil
@@ -152,14 +150,12 @@ func DeleteUser(client tools.HttpClient, org_id, user_id string) error {
 
 func CopyUsers(client tools.HttpClient, org1, org2 string) error {
 	users1 := NewUsers(client, org1)
-	err := users1.Get()
-	if err != nil {
+	if err := users1.Get(); err != nil {
 		return err
 	}
 
 	for _, user := range users1.Users {
-		err = AddUser(client, org2, user.Id, "collaborator")
-		if err != nil {
+		if err := AddUser(client, org2, user.Id, "collaborator"); err != nil {
 			return err
 		}
 	}

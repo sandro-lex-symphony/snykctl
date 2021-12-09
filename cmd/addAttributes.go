@@ -40,8 +40,7 @@ var addAttributesCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, false)
 		prjs := domain.NewProjects(client, args[0])
-		err := prjs.AddAttributes(args[1], attrEnvironment, attrLifecycle, attrCriticality)
-		if err != nil {
+		if err := prjs.AddAttributes(args[1], attrEnvironment, attrLifecycle, attrCriticality); err != nil {
 			return err
 		}
 

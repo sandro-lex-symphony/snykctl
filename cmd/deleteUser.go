@@ -35,8 +35,7 @@ snykctl deleteUser org_id user_id
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, debug)
 
-		err := domain.DeleteUser(client, args[0], args[1])
-		if err != nil {
+		if err := domain.DeleteUser(client, args[0], args[1]); err != nil {
 			return err
 		}
 		fmt.Println("OK")
