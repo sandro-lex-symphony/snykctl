@@ -16,12 +16,12 @@ type testAttributesBody struct {
 
 func Test_Build_AttributesBody(t *testing.T) {
 	tests := []testAttributesBody{
-		testAttributesBody{env: "", lifecycle: "", criticality: "", body: ""},
-		testAttributesBody{env: "production", lifecycle: "", criticality: "", body: `{ "environment": ["production"] }`},
-		testAttributesBody{env: "", lifecycle: "frontend", criticality: "", body: `{ "lifecycle": ["frontend"] }`},
-		testAttributesBody{env: "", lifecycle: "", criticality: "high", body: `{ "criticality": ["high"] }`},
-		testAttributesBody{env: "production", lifecycle: "frontend", criticality: "", body: `{ "environment": ["production"],"lifecycle": ["frontend"] }`},
-		testAttributesBody{env: "production", lifecycle: "frontend", criticality: "medium", body: `{ "environment": ["production"],"lifecycle": ["frontend"],"criticality": ["medium"] }`},
+		{env: "", lifecycle: "", criticality: "", body: ""},
+		{env: "production", lifecycle: "", criticality: "", body: `{ "environment": ["production"] }`},
+		{env: "", lifecycle: "frontend", criticality: "", body: `{ "lifecycle": ["frontend"] }`},
+		{env: "", lifecycle: "", criticality: "high", body: `{ "criticality": ["high"] }`},
+		{env: "production", lifecycle: "frontend", criticality: "", body: `{ "environment": ["production"],"lifecycle": ["frontend"] }`},
+		{env: "production", lifecycle: "frontend", criticality: "medium", body: `{ "environment": ["production"],"lifecycle": ["frontend"],"criticality": ["medium"] }`},
 	}
 
 	for _, test := range tests {
@@ -39,14 +39,14 @@ type testDataAttributes struct {
 
 func Test_ParseAttributes(t *testing.T) {
 	tests := []testDataAttributes{
-		testDataAttributes{env: "frontend", lifecycle: "", criticality: "", msg: ""},
-		testDataAttributes{env: "xxx", lifecycle: "", criticality: "", msg: "invalid environment value: xxx\nValid values: [frontend backend internal external mobile saas on-prem hosted distributed]"},
-		testDataAttributes{env: "", lifecycle: "production", criticality: "", msg: ""},
-		testDataAttributes{env: "", lifecycle: "xxx", criticality: "", msg: "invalid lifecycle value: xxx\nValid values: [production development sandbox]"},
-		testDataAttributes{env: "", lifecycle: "", criticality: "high", msg: ""},
-		testDataAttributes{env: "", lifecycle: "", criticality: "xxx", msg: "invalid lifecycle value: xxx\nValid values: [critical high medium low]"},
-		testDataAttributes{env: "frontend", lifecycle: "production", criticality: "medium", msg: ""},
-		testDataAttributes{env: "xxx", lifecycle: "xxx", criticality: "xxx", msg: "invalid environment value: xxx\nValid values: [frontend backend internal external mobile saas on-prem hosted distributed]"},
+		{env: "frontend", lifecycle: "", criticality: "", msg: ""},
+		{env: "xxx", lifecycle: "", criticality: "", msg: "invalid environment value: xxx\nValid values: [frontend backend internal external mobile saas on-prem hosted distributed]"},
+		{env: "", lifecycle: "production", criticality: "", msg: ""},
+		{env: "", lifecycle: "xxx", criticality: "", msg: "invalid lifecycle value: xxx\nValid values: [production development sandbox]"},
+		{env: "", lifecycle: "", criticality: "high", msg: ""},
+		{env: "", lifecycle: "", criticality: "xxx", msg: "invalid lifecycle value: xxx\nValid values: [critical high medium low]"},
+		{env: "frontend", lifecycle: "production", criticality: "medium", msg: ""},
+		{env: "xxx", lifecycle: "xxx", criticality: "xxx", msg: "invalid environment value: xxx\nValid values: [frontend backend internal external mobile saas on-prem hosted distributed]"},
 	}
 	// var err error
 	for _, test := range tests {
@@ -68,12 +68,12 @@ type testData struct {
 
 func Test_ParseTag(t *testing.T) {
 	tests := []testData{
-		testData{tag: "a=b", key: "a", value: "b", err: nil},
-		testData{tag: "abc", key: "", value: "", err: fmt.Errorf("invalid tag. Not a key=value format")},
-		testData{tag: "==", key: "", value: "", err: fmt.Errorf("invalid tag. Not a key=value format")},
-		testData{tag: "=", key: "", value: "", err: fmt.Errorf("invalid tag. Not a key=value format")},
-		testData{tag: "a=", key: "", value: "", err: fmt.Errorf("invalid tag. Not a key=value format")},
-		testData{tag: "=b", key: "", value: "", err: fmt.Errorf("invalid tag. Not a key=value format")},
+		{tag: "a=b", key: "a", value: "b", err: nil},
+		{tag: "abc", key: "", value: "", err: fmt.Errorf("invalid tag. Not a key=value format")},
+		{tag: "==", key: "", value: "", err: fmt.Errorf("invalid tag. Not a key=value format")},
+		{tag: "=", key: "", value: "", err: fmt.Errorf("invalid tag. Not a key=value format")},
+		{tag: "a=", key: "", value: "", err: fmt.Errorf("invalid tag. Not a key=value format")},
+		{tag: "=b", key: "", value: "", err: fmt.Errorf("invalid tag. Not a key=value format")},
 	}
 
 	for _, test := range tests {
@@ -115,11 +115,11 @@ func Test_ParseTags(t *testing.T) {
 
 func Test_BuildAttributeFilter(t *testing.T) {
 	tests := []testDataAttributes{
-		testDataAttributes{env: "", lifecycle: "", criticality: "", msg: ""},
-		testDataAttributes{env: "frontend", lifecycle: "", criticality: "", msg: `"attributes": { "environment": ["frontend"] }`},
-		testDataAttributes{env: "", lifecycle: "production", criticality: "", msg: `"attributes": { "lifecycle": ["production"] }`},
-		testDataAttributes{env: "", lifecycle: "", criticality: "medium", msg: `"attributes": { "criticality": ["medium"] }`},
-		testDataAttributes{env: "backend", lifecycle: "development", criticality: "medium", msg: `"attributes": { "environment": ["backend"],"lifecycle": ["development"],"criticality": ["medium"] }`},
+		{env: "", lifecycle: "", criticality: "", msg: ""},
+		{env: "frontend", lifecycle: "", criticality: "", msg: `"attributes": { "environment": ["frontend"] }`},
+		{env: "", lifecycle: "production", criticality: "", msg: `"attributes": { "lifecycle": ["production"] }`},
+		{env: "", lifecycle: "", criticality: "medium", msg: `"attributes": { "criticality": ["medium"] }`},
+		{env: "backend", lifecycle: "development", criticality: "medium", msg: `"attributes": { "environment": ["backend"],"lifecycle": ["development"],"criticality": ["medium"] }`},
 	}
 
 	for _, test := range tests {
@@ -129,8 +129,7 @@ func Test_BuildAttributeFilter(t *testing.T) {
 }
 
 func Test_BuildTagsFilter(t *testing.T) {
-	var pTags map[string]string
-	pTags = make(map[string]string)
+	pTags := make(map[string]string)
 	pTags["key"] = "value"
 
 	out := BuildTagsFilter(pTags)
