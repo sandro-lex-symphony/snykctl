@@ -261,3 +261,19 @@ func (p *Projects) DeleteProject(prj_id string) error {
 	}
 	return nil
 }
+
+func (p *Projects) DeleteAllProjects() (string, error) {
+	if err := p.Get(); err != nil {
+		return "", err
+	}
+
+	var out string
+	for _, prj := range p.Projects {
+		if err := p.DeleteProject(prj.Id); err != nil {
+			return "", err
+		}
+		out += fmt.Sprintf("%-38sDELETED\n", prj.Id)
+	}
+
+	return out, nil
+}
