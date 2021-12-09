@@ -34,27 +34,27 @@ type testDataAttributes struct {
 	env         string
 	lifecycle   string
 	criticality string
-	errorMsg    string
+	msg         string
 }
 
 func Test_ParseAttributes(t *testing.T) {
 	tests := []testDataAttributes{
-		testDataAttributes{env: "frontend", lifecycle: "", criticality: "", errorMsg: ""},
-		testDataAttributes{env: "xxx", lifecycle: "", criticality: "", errorMsg: "invalid environment value: xxx\nValid values: [frontend backend internal external mobile saas on-prem hosted distributed]"},
-		testDataAttributes{env: "", lifecycle: "production", criticality: "", errorMsg: ""},
-		testDataAttributes{env: "", lifecycle: "xxx", criticality: "", errorMsg: "invalid lifecycle value: xxx\nValid values: [production development sandbox]"},
-		testDataAttributes{env: "", lifecycle: "", criticality: "high", errorMsg: ""},
-		testDataAttributes{env: "", lifecycle: "", criticality: "xxx", errorMsg: "invalid lifecycle value: xxx\nValid values: [critical high medium low]"},
-		testDataAttributes{env: "frontend", lifecycle: "production", criticality: "medium", errorMsg: ""},
-		testDataAttributes{env: "xxx", lifecycle: "xxx", criticality: "xxx", errorMsg: "invalid environment value: xxx\nValid values: [frontend backend internal external mobile saas on-prem hosted distributed]"},
+		testDataAttributes{env: "frontend", lifecycle: "", criticality: "", msg: ""},
+		testDataAttributes{env: "xxx", lifecycle: "", criticality: "", msg: "invalid environment value: xxx\nValid values: [frontend backend internal external mobile saas on-prem hosted distributed]"},
+		testDataAttributes{env: "", lifecycle: "production", criticality: "", msg: ""},
+		testDataAttributes{env: "", lifecycle: "xxx", criticality: "", msg: "invalid lifecycle value: xxx\nValid values: [production development sandbox]"},
+		testDataAttributes{env: "", lifecycle: "", criticality: "high", msg: ""},
+		testDataAttributes{env: "", lifecycle: "", criticality: "xxx", msg: "invalid lifecycle value: xxx\nValid values: [critical high medium low]"},
+		testDataAttributes{env: "frontend", lifecycle: "production", criticality: "medium", msg: ""},
+		testDataAttributes{env: "xxx", lifecycle: "xxx", criticality: "xxx", msg: "invalid environment value: xxx\nValid values: [frontend backend internal external mobile saas on-prem hosted distributed]"},
 	}
 	// var err error
 	for _, test := range tests {
 		err := ParseAttributes(test.env, test.lifecycle, test.criticality)
 		if err == nil {
-			assert.Equal(t, test.errorMsg, "")
+			assert.Equal(t, test.msg, "")
 		} else {
-			assert.EqualErrorf(t, err, test.errorMsg, "Error should be: %v, got: %v", test.errorMsg, err)
+			assert.EqualErrorf(t, err, test.msg, "Error should be: %v, got: %v", test.msg, err)
 		}
 	}
 }
@@ -111,4 +111,62 @@ func Test_ParseTags(t *testing.T) {
 	_, err = ParseTags(tag)
 	expected := "invalid tag. Not a key=value format"
 	assert.EqualErrorf(t, err, expected, "Error should be: %v, got: %v", expected, err)
+}
+
+func Test_BuildAttributeFilter(t *testing.T) {
+	tests := []testDataAttributes{
+		testDataAttributes{env: "", lifecycle: "", criticality: "", msg: ""},
+		testDataAttributes{env: "frontend", lifecycle: "", criticality: "", msg: `"attributes": { "environment": ["frontend"] }`},
+		testDataAttributes{env: "", lifecycle: "production", criticality: "", msg: `"attributes": { "lifecycle": ["production"] }`},
+		testDataAttributes{env: "", lifecycle: "", criticality: "medium", msg: `"attributes": { "criticality": ["medium"] }`},
+		testDataAttributes{env: "backend", lifecycle: "development", criticality: "medium", msg: `"attributes": { "environment": ["backend"],"lifecycle": ["development"],"criticality": ["medium"] }`},
+	}
+
+	for _, test := range tests {
+		out := BuildAttributesFilter(test.env, test.lifecycle, test.criticality)
+		assert.Equal(t, out, test.msg)
+	}
+}
+
+func Test_BuildTagsFilter(t *testing.T) {
+	var pTags map[string]string
+	pTags = make(map[string]string)
+	pTags["key"] = "value"
+
+	out := BuildTagsFilter(pTags)
+	expected := ` "tags": { "includes": [{ "key": "key", "value": "value" } ] }`
+	assert.Equal(t, expected, out)
+
+	pTags["k2"] = "v2"
+	out = BuildTagsFilter(pTags)
+	expected = ` "tags": { "includes": [{ "key": "key", "value": "value" } , { "key": "k2", "value": "v2" } ] }`
+	assert.Equal(t, expected, out)
+}
+
+func Test_BuildFilterBody(t *testing.T) {
+	var out, expected string
+	var pTags map[string]string
+
+	// attrs empty, tags empty
+	out = BuildFilterBody("", "", "", pTags)
+	expected = ""
+	assert.Equal(t, expected, out)
+
+	// attrs not empty
+	out = BuildFilterBody("frontend", "", "", pTags)
+	expected = `{ "filters": { "attributes": { "environment": ["frontend"] } } }`
+	assert.Equal(t, expected, out)
+
+	// attrs empty, tags not empty
+	pTags = make(map[string]string)
+	pTags["k"] = "v"
+	out = BuildFilterBody("", "", "", pTags)
+	expected = `{ "filters": {  "tags": { "includes": [{ "key": "k", "value": "v" } ] } } }`
+	assert.Equal(t, expected, out)
+
+	// attrs not empty / tags not empty
+	out = BuildFilterBody("frontend", "", "", pTags)
+	expected = `{ "filters": { "attributes": { "environment": ["frontend"] }, "tags": { "includes": [{ "key": "k", "value": "v" } ] } } }`
+	assert.Equal(t, expected, out)
+
 }

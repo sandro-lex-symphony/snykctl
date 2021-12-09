@@ -44,15 +44,6 @@ getProject commands accepts filters such as --tag --env --lifecycle and --critic
 		var ret string
 		var err error
 
-		if rawOutput {
-			ret, err = prjs.GetRaw()
-			if err != nil {
-				return err
-			}
-			fmt.Println(ret)
-			return nil
-		}
-
 		if checkAtLeastOneFilterSet() {
 			err := domain.ParseAttributes(attrEnvironment, attrLifecycle, attrCriticality)
 			if err != nil {
@@ -63,12 +54,28 @@ getProject commands accepts filters such as --tag --env --lifecycle and --critic
 			if err != nil {
 				return err
 			}
-
+			if rawOutput {
+				ret, err = prjs.GetRawFiltered(attrEnvironment, attrLifecycle, attrCriticality, mTags)
+				if err != nil {
+					return err
+				}
+				fmt.Println(ret)
+				return nil
+			}
 			err = prjs.GetFiltered(attrEnvironment, attrLifecycle, attrCriticality, mTags)
 			if err != nil {
 				return err
 			}
 		} else {
+			if rawOutput {
+				ret, err = prjs.GetRaw()
+				if err != nil {
+					return err
+				}
+				fmt.Println(ret)
+				return nil
+			}
+
 			err = prjs.Get()
 			if err != nil {
 				return err

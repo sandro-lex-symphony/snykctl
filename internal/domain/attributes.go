@@ -49,29 +49,12 @@ func BuildAttributesBody(env, lifecycle, criticality string) string {
 }
 
 func BuildAttributesFilter(env, lifecycle, criticality string) string {
-	var attributes string
-
-	if lifecycle == "" && env == "" && criticality == "" {
+	attributes := BuildAttributesBody(env, lifecycle, criticality)
+	if attributes == "" {
 		return ""
 	}
 
-	var attrs []string
-	if lifecycle != "" {
-		at := fmt.Sprintf(`"lifecycle": [ "%s" ]`, lifecycle)
-		attrs = append(attrs, at)
-	}
-	if env != "" {
-		at := fmt.Sprintf(`"environment": [ "%s" ]`, env)
-		attrs = append(attrs, at)
-	}
-
-	if criticality != "" {
-		at := fmt.Sprintf(`"criticality": [ "%s" ]`, criticality)
-		attrs = append(attrs, at)
-	}
-
-	attributes = strings.Join(attrs, ",")
-	return fmt.Sprintf(`"attributes": { %s }`, attributes)
+	return `"attributes": ` + attributes
 }
 
 func ParseTag(tag string) (string, string, error) {
@@ -126,6 +109,9 @@ func BuildFilterBody(env string, lifecycle string, criticality string, mTags map
 	tagsContent := BuildTagsFilter(mTags)
 	if tagsContent != "" {
 		filters = append(filters, tagsContent)
+	}
+	if len(filters) == 0 {
+		return ""
 	}
 	filterContent := strings.Join(filters, ",")
 

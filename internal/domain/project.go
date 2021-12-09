@@ -104,6 +104,18 @@ func (p *Projects) baseGet(raw bool, path string) error {
 }
 
 func (p *Projects) GetFiltered(env string, lifecycle string, criticality string, mTags map[string]string) error {
+	return p.baseGetFiltered(false, env, lifecycle, criticality, mTags)
+}
+
+func (p *Projects) GetRawFiltered(env string, lifecycle string, criticality string, mTags map[string]string) (string, error) {
+	err := p.baseGetFiltered(true, env, lifecycle, criticality, mTags)
+	if err != nil {
+		return "", nil
+	}
+	return p.rawResponse, nil
+}
+
+func (p *Projects) baseGetFiltered(raw bool, env string, lifecycle string, criticality string, mTags map[string]string) error {
 	path := fmt.Sprintf(projectsPath, p.Org.Id)
 	filterBody := BuildFilterBody(env, lifecycle, criticality, mTags)
 
@@ -114,8 +126,16 @@ func (p *Projects) GetFiltered(env string, lifecycle string, criticality string,
 		return fmt.Errorf("Get filtered projects list failed: %s ", resp.Status)
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&p); err != nil {
-		return fmt.Errorf("Get filtered projects list failed: %s ", err)
+	if raw {
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("GetProjects failed: %s", err)
+		}
+		p.rawResponse = string(bodyBytes)
+	} else {
+		if err := json.NewDecoder(resp.Body).Decode(&p); err != nil {
+			return fmt.Errorf("Get filtered projects list failed: %s ", err)
+		}
 	}
 
 	p.sync = true
@@ -241,7 +261,7 @@ func (p *Projects) DeleteProject(prj_id string) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("GetProjects failed: %s", resp.Status)
+		return fmt.Errorf("deleteProject failed: %s", resp.Status)
 	}
 	return nil
 }

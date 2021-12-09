@@ -194,3 +194,94 @@ func Test_GetProject_OK(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, raw, out)
 }
+
+func Test_AddAttributes_OK(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ``
+	client.StatusCode = http.StatusOK
+	client.Status = "XXX"
+	prjs := NewProjects(client, "org_id")
+	err := prjs.AddAttributes("prj_id", "frontend", "", "")
+	assert.Nil(t, err)
+}
+
+func Test_AddAttributes_Parsefailed(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ``
+	client.StatusCode = http.StatusOK
+	client.Status = "XXX"
+	prjs := NewProjects(client, "org_id")
+	err := prjs.AddAttributes("prj_id", "xxx", "", "")
+	expectedErrorMsg := "invalid environment value: xxx\nValid values: [frontend backend internal external mobile saas on-prem hosted distributed]"
+	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
+}
+
+func Test_AddAttributes_KO(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ``
+	client.StatusCode = http.StatusUnauthorized
+	client.Status = "XXX"
+	prjs := NewProjects(client, "org_id")
+	err := prjs.AddAttributes("prj_id", "frontend", "", "")
+	expectedErrorMsg := "failed to add attribute XXX"
+	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
+}
+
+func Test_DeletePrj_OK(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ``
+	client.StatusCode = http.StatusOK
+	client.Status = "XXX"
+	prjs := NewProjects(client, "org_id")
+	err := prjs.DeleteProject("prj_id")
+	assert.Nil(t, err)
+}
+
+func Test_DeleteProject_KO(t *testing.T) {
+	client := tools.NewMockClient()
+	client.ResponseBody = ``
+	client.StatusCode = http.StatusUnauthorized
+	client.Status = "XXX"
+	prjs := NewProjects(client, "org_id")
+	err := prjs.DeleteProject("prj_id")
+	expectedErrorMsg := "deleteProject failed: XXX"
+	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
+}
+
+func Test_GetFiltered_OK(t *testing.T) {
+	client := tools.NewMockClient()
+	raw := `{"org":{"name":"Sandbox","id":"16df2e12-d4cb-400d-aaf2-547db9ff1111"},"projects":[{"id":"2ab89519-82c1-45c6-86c3-ffe024c31111","name":"@example/app","created":"2021-11-22T10:03:04.501Z","origin":"cli","type":"yarn","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":89,"issueCountsBySeverity":{"low":0,"high":0,"medium":0,"critical":0},"remoteRepoUrl":"http://example.com/repo/app.git","imageTag":"1.0.0-SNAPSHOT","lastTestedDate":"2021-12-08T09:35:21.565Z","browseUrl":"https://app.snyk.io/org/sandbox-pie/project/2ab89519-82c1-45c6-86c3-ffe024c31111","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41f1111","name":"org","username":"org","email":null},"tags":[],"attributes":{"criticality":["medium"],"lifecycle":["development"],"environment":["frontend"]},"branch":null}]}`
+	client.ResponseBody = raw
+	client.StatusCode = http.StatusOK
+	client.Status = "XXX"
+	prjs := NewProjects(client, "org_id")
+	var mTags map[string]string
+	err := prjs.GetFiltered("", "", "medium", mTags)
+	assert.Nil(t, err)
+}
+
+func Test_GetFiltered_KO(t *testing.T) {
+	client := tools.NewMockClient()
+	raw := ""
+	client.ResponseBody = raw
+	client.StatusCode = http.StatusUnauthorized
+	client.Status = "XXX"
+	prjs := NewProjects(client, "org_id")
+	var mTags map[string]string
+	err := prjs.GetFiltered("", "", "medium", mTags)
+	expectedErrorMsg := "Get filtered projects list failed: XXX "
+	assert.EqualErrorf(t, err, expectedErrorMsg, "Error should be: %v, got: %v", expectedErrorMsg, err)
+}
+
+func Test_GetRawFiltered_OK(t *testing.T) {
+	client := tools.NewMockClient()
+	raw := `{"org":{"name":"Sandbox","id":"16df2e12-d4cb-400d-aaf2-547db9ff1111"},"projects":[{"id":"2ab89519-82c1-45c6-86c3-ffe024c31111","name":"@example/app","created":"2021-11-22T10:03:04.501Z","origin":"cli","type":"yarn","readOnly":false,"testFrequency":"daily","isMonitored":true,"totalDependencies":89,"issueCountsBySeverity":{"low":0,"high":0,"medium":0,"critical":0},"remoteRepoUrl":"http://example.com/repo/app.git","imageTag":"1.0.0-SNAPSHOT","lastTestedDate":"2021-12-08T09:35:21.565Z","browseUrl":"https://app.snyk.io/org/sandbox-pie/project/2ab89519-82c1-45c6-86c3-ffe024c31111","owner":null,"importingUser":{"id":"7261cefe-93f4-472d-b6cd-27d8f41f1111","name":"org","username":"org","email":null},"tags":[],"attributes":{"criticality":["medium"],"lifecycle":["development"],"environment":["frontend"]},"branch":null}]}`
+	client.ResponseBody = raw
+	client.StatusCode = http.StatusOK
+	client.Status = "XXX"
+	prjs := NewProjects(client, "org_id")
+	var mTags map[string]string
+	out, err := prjs.GetRawFiltered("", "", "medium", mTags)
+	assert.Nil(t, err)
+	assert.Equal(t, raw, out)
+}
