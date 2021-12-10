@@ -9,52 +9,44 @@ import (
 
 const ignorePath = "/org/%s/project/%s/ignores"
 
+type IgnoreResult map[string][]IgnoreStar
+
 type IgnoreStar struct {
-	Star Ignore `json:"*"`
+	Star IgnoreContent `json:"*"`
 }
 
-type Ignore struct {
+type IgnoreContent struct {
 	Reason     string
 	Created    string
 	Expires    string
-	reasonType string
+	ReasonType string
 	IgnoredBy  User
 }
 
-type IgnoreResult struct {
+type Ignore struct {
 	Id      string
-	Content Ignore
+	Content IgnoreContent
 }
 
-func GetProjectIgnores(client tools.HttpClient, org_id, prj_id string) ([]IgnoreResult, error) {
-	var result []IgnoreResult
+func GetProjectIgnores(client tools.HttpClient, org_id, prj_id string) (IgnoreResult, error) {
+	var res IgnoreResult
 	path := fmt.Sprintf(ignorePath, org_id, prj_id)
+
 	resp := client.RequestGet(path)
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return result, fmt.Errorf("GetProjects failed: %s", resp.Status)
+		return res, fmt.Errorf("getProjectsIgnores failed: %s", resp.Status)
 	}
 
-	var ignore_result map[string][]IgnoreStar
-
-	if err := json.NewDecoder(resp.Body).Decode(&ignore_result); err != nil {
-		return result, err
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return res, err
 	}
 
-	for key, value := range ignore_result {
-		for i := 0; i < len(value); i++ {
-			var ii IgnoreResult
-			ii.Id = key
-			ii.Content = value[i].Star
-			result = append(result, ii)
-		}
-	}
-
-	return result, nil
+	return res, nil
 }
 
-func FormatIgnore(res IgnoreResult, prj string) string {
+func FormatIgnore(res Ignore, prj string) string {
 	if prj != "" {
 		return fmt.Sprintf("%-38s%-30s%-30s%-30s%s\n", prj, res.Id, res.Content.Created, res.Content.IgnoredBy.Email, res.Content.Reason)
 	} else {
@@ -62,11 +54,20 @@ func FormatIgnore(res IgnoreResult, prj string) string {
 	}
 }
 
-func FormatIgnoreResult(res []IgnoreResult, prj string) string {
-	var out string
-	for i := 0; i < len(res); i++ {
-		out += FormatIgnore(res[i], prj)
+func FormatIgnoreResult(res IgnoreResult, prj string) string {
+	var items []Ignore
+	for key, value := range res {
+		for i := 0; i < len(value); i++ {
+			var ii Ignore
+			ii.Id = key
+			ii.Content = value[i].Star
+			items = append(items, ii)
+		}
 	}
 
+	var out string
+	for i := 0; i < len(items); i++ {
+		out += FormatIgnore(items[i], prj)
+	}
 	return out
 }

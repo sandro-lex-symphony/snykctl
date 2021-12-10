@@ -24,7 +24,7 @@ coverage:
 
 install-goimports:
 	@if [ ! -f ./goimports ]; then \
-		cd ~ && go get -u golang.org/x/tools/cmd/goimports; \
+		cd ~ && go install golang.org/x/tools/cmd/goimports@latest; \
 	fi
 
 .PHONY: clean build test
