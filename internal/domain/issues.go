@@ -54,7 +54,7 @@ func (p *Projects) GetIssues(prj_id string, issueType string) (ProjectIssuesResu
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return out, fmt.Errorf("getIssues failed: %s ", resp.Status)
+		return out, fmt.Errorf("getIssues failed: %s", resp.Status)
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&out); err != nil {
@@ -78,7 +78,7 @@ func FormatProjectIssues(in ProjectIssuesResult, prj_id string) string {
 
 func CheckIssueType(t string) error {
 	if t != "" {
-		if t != "license" && t != "vuln" && t != "vulnerability" {
+		if t != "license" && t != "vuln" {
 			return fmt.Errorf("invalid type. (license | vuln)")
 		}
 	}
