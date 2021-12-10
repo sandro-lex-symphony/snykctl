@@ -24,27 +24,46 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// getProjectIssuesCmd represents the getProjectIssues command
-var getProjectIssuesCmd = &cobra.Command{
-	Use:   "getProjectIssues",
+// getIssuesCmd represents the getIssues command
+var getIssuesCmd = &cobra.Command{
+	Use:   "getIssues",
 	Short: "get the aggregated project issues",
 	Long: `get the aggregated project issues. For example:
-snykctl getProjectIssues org_id prj_id
+snykctl getIssues org_id prj_id
+snykctl getIssues org_id
 `,
-	Args: cobra.MinimumNArgs(2),
+	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := tools.NewHttpclient(config.Instance, debug)
 		prjs := domain.NewProjects(client, args[0])
 
-		out, err := prjs.GetProjectIssues(args[1])
-		if err != nil {
-			return err
+		var res domain.ProjectIssuesResult
+		var prj_id, out string
+		var err error
+		if len(args) > 1 {
+			res, err = prjs.GetIssues(args[1], issueType)
+			if err != nil {
+				return err
+			}
+			out = domain.FormatProjectIssues(res, prj_id)
+
+		} else {
+			prjs.Get()
+			for _, prj := range prjs.Projects {
+				res, err = prjs.GetIssues(prj.Id, issueType)
+				if err != nil {
+					return err
+				}
+				out += domain.FormatProjectIssues(res, prj.Id)
+			}
 		}
+
 		fmt.Print(out)
 		return nil
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(getProjectIssuesCmd)
+	rootCmd.AddCommand(getIssuesCmd)
+	getIssuesCmd.PersistentFlags().StringVarP(&issueType, "type", "t", "", "Issue Type [license | vuln]")
 }

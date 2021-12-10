@@ -30,6 +30,7 @@ var getIgnoresCmd = &cobra.Command{
 	Short: "get the list of ignores for a project",
 	Long: `get the list of ignores for a project. For example:
 snykctl getIgnores org_id prj_id
+snykctl getIgnores org_id
 `,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -63,14 +64,4 @@ snykctl getIgnores org_id prj_id
 
 func init() {
 	rootCmd.AddCommand(getIgnoresCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// getIgnoresCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// getIgnoresCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

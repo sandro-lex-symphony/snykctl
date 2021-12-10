@@ -31,6 +31,7 @@ var attrEnvironment string
 var attrLifecycle string
 var attrCriticality string
 var attrTag []string
+var issueType string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
