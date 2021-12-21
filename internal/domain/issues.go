@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"snykctl/internal/tools"
 )
+
+const issuesPathPath = "/org/%s/project/%s/issue/%s/paths"
 
 type ProjectIssuesResult struct {
 	Issues []*Issue
@@ -95,4 +98,21 @@ func BuildIssueTypeFilter(issueType string) string {
 		content = `"types": [ "vuln", "license" ]`
 	}
 	return fmt.Sprintf(`{"filters": {%s}}`, content)
+}
+
+func GetProjectIssuePaths(client tools.HttpClient, org_id string, prj_id string, issue_id string) (*IssuePathsResult, error) {
+	path := fmt.Sprintf(issuesPathPath, org_id, prj_id, issue_id)
+	resp := client.RequestGet(path)
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("GetProjectIssues failed %s", resp.Status)
+	}
+
+	var result IssuePathsResult
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
